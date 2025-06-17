@@ -1,0 +1,2 @@
+# No Python dependencies required
+# The project now uses shell scripts instead of Python scripts 

@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-05-21T19:28:58-07:00",
+  "total_conversations": 3,
+  "successful_conversations": 0,
+  "failed_conversations": 3,
+  "total_exchanges": 9,
+  "successful_exchanges": 0,
+  "failed_exchanges": 9,
+  "total_test_duration": 5.324444000,
+  "average_conversation_time": 1.77481466666666666666
+}

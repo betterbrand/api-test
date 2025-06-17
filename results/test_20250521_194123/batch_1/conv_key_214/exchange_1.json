@@ -1,0 +1,7 @@
+{
+  "prompt": "What's the capital of France?",
+  "conversation_id": "conv_1747881683_28298",
+  "status": "3",
+  "duration": ".049011000",
+  "error": "API request failed with status 3"
+}

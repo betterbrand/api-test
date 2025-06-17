@@ -1,0 +1,28 @@
+{
+  "prompt": "What's the capital of France?",
+  "conversation_id": "conv_1747883604_15921",
+  "status": "0",
+  "duration": "1.027374000",
+  "response": {
+    "id": "chatcmpl-6158f7c340d4457a4d214fd0a85674ee",
+    "object": "chat.completion",
+    "created": 1747883623,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "The capital of France is Paris. Where are you going?"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 13,
+      "total_tokens": 512
+    },
+    "system_fingerprint": ""
+  }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Morpheus API Load Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+    .success { color: green; }
+    .failure { color: red; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .failed-conversation { margin-bottom: 20px; }
+    .error-message { color: red; font-family: monospace; }
+    .error-log { font-size: 0.9em; }
+    hr { margin: 30px 0; border: 0; border-top: 1px dashed #ccc; }
+  </style>
+</head>
+<body>
+  <h1>Morpheus API Load Test Report</h1>
+  <div class="summary">
+    <h2>Summary</h2>
+    <p>Test conducted on: <strong>2025-05-21 19:45:50</strong></p>
+    <p>API Endpoint: <strong>[2025-05-21 19:45:45] [INFO] Determining API endpoint from https://openbeta.kyletest.com/test
+[2025-05-21 19:45:46] [INFO] Found API endpoint: https://api.mor.org/api/v1/chat/completions
+https://api.mor.org/api/v1/chat/completions</strong></p>
+    <p>Total conversations: <strong>       3</strong></p>
+    <p>Successful conversations: <strong class="success">0</strong></p>
+    <p>Failed conversations: <strong class="failure">3</strong></p>
+    <p>Total exchanges: <strong>       9</strong></p>
+    <p>Successful exchanges: <strong class="success">0</strong></p>
+    <p>Failed exchanges: <strong class="failure">9</strong></p>
+    <p>Total test duration: <strong>3.908080000 seconds</strong></p>
+    <p>Average conversation time: <strong>1.30269333333333333333 seconds</strong></p>
+  </div>
+
+  <div class="failed-logs">
+    <h2>Failed Conversation Logs</h2>
+    <div class='failed-conversation'><h3>Conversation ID: conv_key_214 (API Key: sk-eaBfpj....)</h3><table class='error-log'><tr><th>Exchange</th><th>Prompt</th><th>Status</th><th>Duration</th><th>Error</th></tr><tr><td>1</td><td>What's the weather like today?</td><td>3</td><td>.059329000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>2</td><td>How do I bake a chocolate cake?</td><td>3</td><td>.051715000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>3</td><td>Explain blockchain technology</td><td>3</td><td>.046399000</td><td class='error-message'>API request failed with status 3</td></tr></table></div><hr><div class='failed-conversation'><h3>Conversation ID: conv_key_213 (API Key: sk-ZIMnKa....)</h3><table class='error-log'><tr><th>Exchange</th><th>Prompt</th><th>Status</th><th>Duration</th><th>Error</th></tr><tr><td>1</td><td>Tell me about artificial intelligence</td><td>3</td><td>.059244000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>2</td><td>How do I learn to code?</td><td>3</td><td>.051089000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>3</td><td>What's the weather like today?</td><td>3</td><td>.046392000</td><td class='error-message'>API request failed with status 3</td></tr></table></div><hr><div class='failed-conversation'><h3>Conversation ID: conv_key_212 (API Key: sk-qOkBJ1....)</h3><table class='error-log'><tr><th>Exchange</th><th>Prompt</th><th>Status</th><th>Duration</th><th>Error</th></tr><tr><td>1</td><td>What's the weather like today?</td><td>3</td><td>.059348000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>2</td><td>Explain quantum computing</td><td>3</td><td>.051856000</td><td class='error-message'>API request failed with status 3</td></tr><tr><td>3</td><td>Explain quantum computing</td><td>3</td><td>.046485000</td><td class='error-message'>API request failed with status 3</td></tr></table></div><hr>
+  </div>
+</body>
+</html>

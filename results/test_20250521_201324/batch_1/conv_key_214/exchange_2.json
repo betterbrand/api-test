@@ -1,0 +1,28 @@
+{
+  "prompt": "What's the weather like today?",
+  "conversation_id": "conv_1747883604_32759",
+  "status": "0",
+  "duration": "1.194620000",
+  "response": {
+    "id": "chatcmpl-9e363047609b10a36b307120ff792a23",
+    "object": "chat.completion",
+    "created": 1747883621,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "To give you the most accurate information, could you please tell me where you are located?"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 499,
+      "completion_tokens": 19,
+      "total_tokens": 518
+    },
+    "system_fingerprint": ""
+  }
+}

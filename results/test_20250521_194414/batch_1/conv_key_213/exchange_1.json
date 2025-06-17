@@ -1,0 +1,7 @@
+{
+  "prompt": "What's the weather like today?",
+  "conversation_id": "conv_1747881854_9412",
+  "status": "3",
+  "duration": ".049376000",
+  "error": "API request failed with status 3"
+}
