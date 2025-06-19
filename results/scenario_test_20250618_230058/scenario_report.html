@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Morpheus API Scenario Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .scenario { background: #f9f9f9; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .success { color: green; font-weight: bold; }
+        .failure { color: red; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Morpheus API Scenario Test Report</h1>
+    
+    <div class="summary">
+        <h2>Overall Test Summary</h2>
+        <p>Test conducted on: <strong>2025-06-18 23:02:20</strong></p>
+        <p>Total requests across all scenarios: <strong>310</strong></p>
+        <p>Successful requests: <strong class="success">310</strong></p>
+        <p>Failed requests: <strong class="failure">0</strong></p>
+        <p>Success rate: <strong>100.00%</strong></p>
+    </div>
+    
+    <h2>Scenario Results</h2>
+    
+    <table>
+        <tr>
+            <th>Scenario</th>
+            <th>Description</th>
+            <th>Total Requests</th>
+            <th>Duration (seconds)</th>
+            <th>Requests/Second</th>
+        </tr>
+        <tr>
+            <td>1a</td>
+            <td>Single key, 10 serial requests</td>
+            <td>10</td>
+            <td>3.559701000</td>
+            <td>2.80</td>
+        </tr>
+        <tr>
+            <td>1b</td>
+            <td>Single key, 100 serial requests</td>
+            <td>100</td>
+            <td>38.240751000</td>
+            <td>2.61</td>
+        </tr>
+        <tr>
+            <td>2a</td>
+            <td>Single key, 10 concurrent requests</td>
+            <td>10</td>
+            <td>0.901304000</td>
+            <td>11.09</td>
+        </tr>
+        <tr>
+            <td>2b</td>
+            <td>Single key, 100 concurrent requests</td>
+            <td>100</td>
+            <td>1.489434000</td>
+            <td>67.13</td>
+        </tr>
+        <tr>
+            <td>3a</td>
+            <td>5 keys, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>12.108878000</td>
+            <td>4.12</td>
+        </tr>
+        <tr>
+            <td>3b</td>
+            <td>5 keys, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>23.614734000</td>
+            <td>4.23</td>
+        </tr>
+        <tr>
+            <td>4a</td>
+            <td>5 keys, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>0.410944000</td>
+            <td>121.67</td>
+        </tr>
+        <tr>
+            <td>4b</td>
+            <td>5 keys, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>0.468618000</td>
+            <td>213.39</td>
+        </tr>
+        <tr>
+            <td>5a</td>
+            <td>5 keys with different models, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>0.019804000</td>
+            <td>2524.74</td>
+        </tr>
+        <tr>
+            <td>5b</td>
+            <td>5 keys with different models, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>0.018527000</td>
+            <td>5397.52</td>
+        </tr>
+        <tr>
+            <td>6a</td>
+            <td>5 keys with different models, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>0.151814000</td>
+            <td>329.35</td>
+        </tr>
+        <tr>
+            <td>6b</td>
+            <td>5 keys with different models, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>0.156221000</td>
+            <td>640.11</td>
+        </tr>
+    </table>
+    
+    <h2>Scenario Details</h2>
+    <div class="scenario">
+        <h3>Scenario 1a</h3>
+        <p><strong>Description:</strong> Single key, 10 serial requests</p>
+        <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 1b</h3>
+        <p><strong>Description:</strong> Single key, 100 serial requests</p>
+        <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 2a</h3>
+        <p><strong>Description:</strong> Single key, 10 concurrent requests</p>
+        <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 2b</h3>
+        <p><strong>Description:</strong> Single key, 100 concurrent requests</p>
+        <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 3a</h3>
+        <p><strong>Description:</strong> 5 keys, 10 serial requests per key (50 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 3b</h3>
+        <p><strong>Description:</strong> 5 keys, 20 serial requests per key (100 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 4a</h3>
+        <p><strong>Description:</strong> 5 keys, 10 concurrent requests per key (50 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 4b</h3>
+        <p><strong>Description:</strong> 5 keys, 20 concurrent requests per key (100 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 5a</h3>
+        <p><strong>Description:</strong> 5 keys with different models, 10 serial requests per key (50 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 5b</h3>
+        <p><strong>Description:</strong> 5 keys with different models, 20 serial requests per key (100 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 6a</h3>
+        <p><strong>Description:</strong> 5 keys with different models, 10 concurrent requests per key (50 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+    </div>
+    <div class="scenario">
+        <h3>Scenario 6b</h3>
+        <p><strong>Description:</strong> 5 keys with different models, 20 concurrent requests per key (100 total)</p>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+    </div>
+</body>
+</html>

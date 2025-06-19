@@ -1,0 +1,6 @@
+{
+  "scenario": "5a",
+  "description": "5 keys with different models, 10 serial requests per key (50 total)",
+  "total_requests": 50,
+  "duration": 0.019804000
+}
