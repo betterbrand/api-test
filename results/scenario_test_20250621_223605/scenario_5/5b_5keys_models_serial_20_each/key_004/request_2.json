@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_004_2",
+  "status": "0",
+  "duration": "3.639050000",
+  "model": "llama-3.1-405b",
+  "error": "Retry after session refresh failed: {\"error\":\"session expired\"}"
+}

@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_17",
+  "status": "0",
+  "duration": "2.278696000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-ec44ad7d10ce87db4e1bcd746bc0ccf7",
+    "object": "chat.completion",
+    "created": 1750570720,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence refers to the development of computer systems capable of performing tasks that typically require human intelligence, such as learning, reasoning, problem-solving, perception, and language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

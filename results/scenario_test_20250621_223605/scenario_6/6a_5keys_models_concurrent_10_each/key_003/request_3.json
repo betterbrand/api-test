@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_3",
+  "status": "0",
+  "duration": "2.888266000",
+  "model": "qwen-2.5-coder-32b",
+  "response": {
+    "id": "chatcmpl-57975878e3b3baaa08ab7384fb7f2c4f",
+    "object": "chat.completion",
+    "created": 1750575422,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence involves the creation of intelligent machines capable of performing tasks that typically require human cognition, such as learning, reasoning, problem-solving, and decision-making."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 33,
+      "total_tokens": 535
+    },
+    "system_fingerprint": ""
+  }
+}

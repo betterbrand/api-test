@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_9",
+  "status": "0",
+  "duration": ".782450000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-8c3e07874725770f3031b0327e65856c",
+    "object": "chat.completion",
+    "created": 1750570756,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I don't have the information"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 7,
+      "total_tokens": 509
+    },
+    "system_fingerprint": ""
+  }
+}

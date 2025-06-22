@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_4",
+  "status": "0",
+  "duration": "1.820502000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-56fc58c9b3ac1c997d416b2665c52ba7",
+    "object": "chat.completion",
+    "created": 1750575282,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "### French:\nL'apprentissage artificiel est une technologie qui permet aux ordinateurs d'imiter des fonctions cognitives humaines telles que l'apprentissage et la résolution de problèmes.\n\n### English:\nArtificial intelligence (AI) is a technology that enables computers to mimic human cognitive functions such as learning and problem-solving."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 65,
+      "total_tokens": 567
+    },
+    "system_fingerprint": ""
+  }
+}

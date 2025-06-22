@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_8",
+  "status": "0",
+  "duration": "2.728656000",
+  "model": "qwen-2.5-coder-32b",
+  "response": {
+    "id": "chatcmpl-6bfd1b8f54461167c137892a4a3bbc94",
+    "object": "chat.completion",
+    "created": 1750575422,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence (AI) is a branch of computer science aimed at creating systems capable of performing tasks that typically require human intelligence, such as learning, reasoning, problem-solving, perception, and language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 42,
+      "total_tokens": 544
+    },
+    "system_fingerprint": ""
+  }
+}

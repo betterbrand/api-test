@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_17",
+  "status": "0",
+  "duration": "1.022674000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-077e0f8e743245ca3c60cee8176ad80e",
+    "object": "chat.completion",
+    "created": 1750570605,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence is a field of technology that aims to create systems capable of performing tasks that typically require human intelligence."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 24,
+      "total_tokens": 526
+    },
+    "system_fingerprint": ""
+  }
+}

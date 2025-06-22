@@ -1,9 +1,0 @@
-{
-  "conversation_id": "conv_key_214_8",
-  "status": "0",
-  "duration": ".286728000",
-  "model": "default",
-  "response": {
-    "detail": "Invalid API key format. Must start with sk-"
-  }
-}

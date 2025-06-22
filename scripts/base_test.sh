@@ -72,16 +72,21 @@ prepare_api_keys() {
     # Extract first API key for single-key scenarios
     jq '.api_keys[0]' "$API_KEYS_FILE" > "$test_dir/single_key.json"
     
-    # Extract first 5 API keys for multi-key scenarios
-    jq '{api_keys: .api_keys[0:5]}' "$API_KEYS_FILE" > "$test_dir/five_keys.json"
+    # Check how many keys we actually have
+    local available_keys=$(jq '.api_keys | length' "$API_KEYS_FILE")
+    log_info "Available API keys: $available_keys"
     
-    # Create 5 keys with different models assigned
+    # Use all available keys (up to 5) for multi-key scenarios
+    jq --arg max_keys "$([ $available_keys -gt 5 ] && echo 5 || echo $available_keys)" '
+    {api_keys: .api_keys[0:($max_keys | tonumber)]}' "$API_KEYS_FILE" > "$test_dir/five_keys.json"
+    
+    # Create keys with different models assigned (cycling through models if we have fewer keys)
     jq --argjson models '["'"${MODELS[0]}"'","'"${MODELS[1]}"'","'"${MODELS[2]}"'","'"${MODELS[3]}"'","'"${MODELS[4]}"'"]' '
     {
         api_keys: [
-            .api_keys[0:5][] | . + {model: $models[.api_keys | map(.id == .id) | index(true)]}
+            .api_keys | to_entries | map(.value + {model: $models[.key % ($models | length)]}) | .[]
         ]
-    }' "$API_KEYS_FILE" > "$test_dir/five_keys_models.json"
+    }' "$test_dir/five_keys.json" > "$test_dir/five_keys_models.json"
 }
 
 # Send a single request with custom model support
@@ -90,6 +95,8 @@ send_single_request() {
     local conversation_id="$2"
     local result_file="$3"
     local model="${4:-default}"
+    
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [REQUEST] Starting request for $conversation_id with key $api_key, model $model"
     
     local start_time=$(date +%s.%N)
     
@@ -110,6 +117,8 @@ send_single_request() {
         \"stream\": false
     }"
     
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [REQUEST_BODY] $conversation_id: $request_body"
+    
     # Use curl to send the request
     curl -s -X 'POST' \
         "https://api.mor.org/api/v1/chat/completions" \
@@ -122,9 +131,31 @@ send_single_request() {
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
     
+    # Log the raw response
+    local response_content=$(cat "$response_file")
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [RESPONSE] $conversation_id (status: $status, duration: ${duration}s): $response_content"
+    
     # Process the response
-    if [ $status -eq 0 ] && ! jq -e '.error' "$response_file" > /dev/null 2>&1; then
+    local has_error=false
+    local error_msg=""
+    
+    if [ $status -ne 0 ]; then
+        has_error=true
+        error_msg="HTTP request failed with status $status"
+    elif jq -e '.error' "$response_file" > /dev/null 2>&1; then
+        has_error=true
+        error_msg=$(jq -r '.error.message // .error // "API error"' "$response_file")
+    elif jq -e '.detail' "$response_file" > /dev/null 2>&1; then
+        has_error=true
+        error_msg=$(jq -r '.detail // "API detail error"' "$response_file")
+    elif ! jq -e '.choices' "$response_file" > /dev/null 2>&1; then
+        has_error=true
+        error_msg="No choices in response - likely an error"
+    fi
+    
+    if [ "$has_error" = false ]; then
         # Success
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SUCCESS] Request succeeded for $conversation_id"
         jq -n \
             --arg conversation_id "$conversation_id" \
             --arg status "$status" \
@@ -134,13 +165,7 @@ send_single_request() {
             '{conversation_id: $conversation_id, status: $status, duration: $duration, model: $model, response: $response[0]}' > "$result_file"
     else
         # Error
-        local error_msg="Request failed"
-        if [ $status -eq 0 ]; then
-            error_msg=$(jq -r '.error.message // .error // "Unknown API error"' "$response_file")
-        else
-            error_msg="HTTP request failed with status $status"
-        fi
-        
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Request failed for $conversation_id: $error_msg"
         jq -n \
             --arg conversation_id "$conversation_id" \
             --arg status "$status" \
@@ -223,8 +248,9 @@ run_scenario_2() {
     log_info "Scenario 2a: 10 concurrent requests"
     local start_time=$(date +%s.%N)
     
+    export -f send_single_request
     seq 1 10 | parallel -j10 \
-        "$(declare -f send_single_request); send_single_request '$api_key' 'conv_${key_id}_{}' '$scenario_2a_dir/request_{}.json'"
+        send_single_request "'$api_key'" "'conv_${key_id}_{}'" "'$scenario_2a_dir/request_{}.json'"
     
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
@@ -244,7 +270,7 @@ run_scenario_2() {
     start_time=$(date +%s.%N)
     
     seq 1 100 | parallel -j100 \
-        "$(declare -f send_single_request); send_single_request '$api_key' 'conv_${key_id}_{}' '$scenario_2b_dir/request_{}.json'"
+        send_single_request "'$api_key'" "'conv_${key_id}_{}'" "'$scenario_2b_dir/request_{}.json'"
     
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
@@ -285,10 +311,13 @@ run_scenario_3() {
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    local actual_requests=$(find "$scenario_3a_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "3a" \
         --arg description "5 keys, 10 serial requests per key (50 total)" \
-        --arg total_requests "50" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_3a_dir/summary.json"
     
@@ -313,10 +342,13 @@ run_scenario_3() {
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    actual_requests=$(find "$scenario_3b_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "3b" \
         --arg description "5 keys, 20 serial requests per key (100 total)" \
-        --arg total_requests "100" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_3b_dir/summary.json"
 }
@@ -335,24 +367,44 @@ run_scenario_4() {
     log_info "Scenario 4a: 10 concurrent requests per key (50 total)"
     local start_time=$(date +%s.%N)
     
-    jq -c '.api_keys[]' "$test_dir/five_keys.json" | parallel -j5 '
-        key_data={}
-        api_key=$(echo "$key_data" | jq -r .key)
-        key_id=$(echo "$key_data" | jq -r .id)
+    # Use a temporary file approach which is more reliable
+    export -f send_single_request
+    
+    # Create a temporary file with all requests
+    local request_file=$(mktemp)
+    
+    # Read keys and create requests
+    local keys_json=$(cat "$test_dir/five_keys.json")
+    local key_count=$(echo "$keys_json" | jq '.api_keys | length')
+    
+    for ((k=0; k<key_count; k++)); do
+        local api_key=$(echo "$keys_json" | jq -r ".api_keys[$k].key")
+        local key_id=$(echo "$keys_json" | jq -r ".api_keys[$k].id")
         
-        mkdir -p "'"$scenario_4a_dir"'/$key_id"
+        mkdir -p "$scenario_4a_dir/$key_id"
         
-        seq 1 10 | parallel -j10 \
-            "$(declare -f send_single_request); send_single_request \"$api_key\" \"conv_${key_id}_{}\" \"'"$scenario_4a_dir"'/$key_id/request_{}.json\""
-    '
+        # Add each request to the file (space-separated for parallel -N3)
+        for i in $(seq 1 10); do
+            echo "$api_key conv_${key_id}_$i $scenario_4a_dir/$key_id/request_$i.json" >> "$request_file"
+        done
+    done
+    
+    # Execute all requests in parallel from the file
+    cat "$request_file" | xargs -n3 -P30 bash -c 'send_single_request "$1" "$2" "$3"' _
+    
+    # Clean up
+    rm -f "$request_file"
     
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    local actual_requests=$(find "$scenario_4a_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "4a" \
         --arg description "5 keys, 10 concurrent requests per key (50 total)" \
-        --arg total_requests "50" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_4a_dir/summary.json"
     
@@ -363,24 +415,41 @@ run_scenario_4() {
     log_info "Scenario 4b: 20 concurrent requests per key (100 total)"
     start_time=$(date +%s.%N)
     
-    jq -c '.api_keys[]' "$test_dir/five_keys.json" | parallel -j5 '
-        key_data={}
-        api_key=$(echo "$key_data" | jq -r .key)
-        key_id=$(echo "$key_data" | jq -r .id)
+    # Use a temporary file approach which is more reliable
+    local request_file=$(mktemp)
+    
+    # Read keys and create requests
+    local keys_json=$(cat "$test_dir/five_keys.json")
+    local key_count=$(echo "$keys_json" | jq '.api_keys | length')
+    
+    for ((k=0; k<key_count; k++)); do
+        local api_key=$(echo "$keys_json" | jq -r ".api_keys[$k].key")
+        local key_id=$(echo "$keys_json" | jq -r ".api_keys[$k].id")
         
-        mkdir -p "'"$scenario_4b_dir"'/$key_id"
+        mkdir -p "$scenario_4b_dir/$key_id"
         
-        seq 1 20 | parallel -j20 \
-            "$(declare -f send_single_request); send_single_request \"$api_key\" \"conv_${key_id}_{}\" \"'"$scenario_4b_dir"'/$key_id/request_{}.json\""
-    '
+        # Add each request to the file (space-separated for parallel -N3)
+        for i in $(seq 1 20); do
+            echo "$api_key conv_${key_id}_$i $scenario_4b_dir/$key_id/request_$i.json" >> "$request_file"
+        done
+    done
+    
+    # Execute all requests in parallel from the file
+    cat "$request_file" | xargs -n3 -P60 bash -c 'send_single_request "$1" "$2" "$3"' _
+    
+    # Clean up
+    rm -f "$request_file"
     
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    actual_requests=$(find "$scenario_4b_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "4b" \
         --arg description "5 keys, 20 concurrent requests per key (100 total)" \
-        --arg total_requests "100" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_4b_dir/summary.json"
 }
@@ -414,10 +483,13 @@ run_scenario_5() {
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    local actual_requests=$(find "$scenario_5a_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "5a" \
         --arg description "5 keys with different models, 10 serial requests per key (50 total)" \
-        --arg total_requests "50" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_5a_dir/summary.json"
     
@@ -443,10 +515,13 @@ run_scenario_5() {
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    actual_requests=$(find "$scenario_5b_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "5b" \
         --arg description "5 keys with different models, 20 serial requests per key (100 total)" \
-        --arg total_requests "100" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_5b_dir/summary.json"
 }
@@ -465,25 +540,42 @@ run_scenario_6() {
     log_info "Scenario 6a: 10 concurrent requests per key with different models (50 total)"
     local start_time=$(date +%s.%N)
     
-    jq -c '.api_keys[]' "$test_dir/five_keys_models.json" | parallel -j5 '
-        key_data={}
-        api_key=$(echo "$key_data" | jq -r .key)
-        key_id=$(echo "$key_data" | jq -r .id)
-        model=$(echo "$key_data" | jq -r .model)
+    # Use a temporary file approach which is more reliable
+    local request_file=$(mktemp)
+    
+    # Read keys and create requests
+    local keys_json=$(cat "$test_dir/five_keys_models.json")
+    local key_count=$(echo "$keys_json" | jq '.api_keys | length')
+    
+    for ((k=0; k<key_count; k++)); do
+        local api_key=$(echo "$keys_json" | jq -r ".api_keys[$k].key")
+        local key_id=$(echo "$keys_json" | jq -r ".api_keys[$k].id")
+        local model=$(echo "$keys_json" | jq -r ".api_keys[$k].model")
         
-        mkdir -p "'"$scenario_6a_dir"'/$key_id"
+        mkdir -p "$scenario_6a_dir/$key_id"
         
-        seq 1 10 | parallel -j10 \
-            "$(declare -f send_single_request); send_single_request \"$api_key\" \"conv_${key_id}_{}\" \"'"$scenario_6a_dir"'/$key_id/request_{}.json\" \"$model\""
-    '
+        # Add each request to the file (space-separated for parallel -N4)
+        for i in $(seq 1 10); do
+            echo "$api_key conv_${key_id}_$i $scenario_6a_dir/$key_id/request_$i.json $model" >> "$request_file"
+        done
+    done
+    
+    # Execute all requests in parallel from the file
+    cat "$request_file" | xargs -n4 -P30 bash -c 'send_single_request "$1" "$2" "$3" "$4"' _
+    
+    # Clean up
+    rm -f "$request_file"
     
     local end_time=$(date +%s.%N)
     local duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    local actual_requests=$(find "$scenario_6a_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "6a" \
         --arg description "5 keys with different models, 10 concurrent requests per key (50 total)" \
-        --arg total_requests "50" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_6a_dir/summary.json"
     
@@ -494,25 +586,42 @@ run_scenario_6() {
     log_info "Scenario 6b: 20 concurrent requests per key with different models (100 total)"
     start_time=$(date +%s.%N)
     
-    jq -c '.api_keys[]' "$test_dir/five_keys_models.json" | parallel -j5 '
-        key_data={}
-        api_key=$(echo "$key_data" | jq -r .key)
-        key_id=$(echo "$key_data" | jq -r .id)
-        model=$(echo "$key_data" | jq -r .model)
+    # Use a temporary file approach which is more reliable
+    local request_file=$(mktemp)
+    
+    # Read keys and create requests
+    local keys_json=$(cat "$test_dir/five_keys_models.json")
+    local key_count=$(echo "$keys_json" | jq '.api_keys | length')
+    
+    for ((k=0; k<key_count; k++)); do
+        local api_key=$(echo "$keys_json" | jq -r ".api_keys[$k].key")
+        local key_id=$(echo "$keys_json" | jq -r ".api_keys[$k].id")
+        local model=$(echo "$keys_json" | jq -r ".api_keys[$k].model")
         
-        mkdir -p "'"$scenario_6b_dir"'/$key_id"
+        mkdir -p "$scenario_6b_dir/$key_id"
         
-        seq 1 20 | parallel -j20 \
-            "$(declare -f send_single_request); send_single_request \"$api_key\" \"conv_${key_id}_{}\" \"'"$scenario_6b_dir"'/$key_id/request_{}.json\" \"$model\""
-    '
+        # Add each request to the file (space-separated for parallel -N4)
+        for i in $(seq 1 20); do
+            echo "$api_key conv_${key_id}_$i $scenario_6b_dir/$key_id/request_$i.json $model" >> "$request_file"
+        done
+    done
+    
+    # Execute all requests in parallel from the file
+    cat "$request_file" | xargs -n4 -P60 bash -c 'send_single_request "$1" "$2" "$3" "$4"' _
+    
+    # Clean up
+    rm -f "$request_file"
     
     end_time=$(date +%s.%N)
     duration=$(echo "$end_time - $start_time" | bc)
     
+    # Calculate actual total requests made
+    actual_requests=$(find "$scenario_6b_dir" -name "request_*.json" | wc -l)
+    
     jq -n \
         --arg scenario "6b" \
         --arg description "5 keys with different models, 20 concurrent requests per key (100 total)" \
-        --arg total_requests "100" \
+        --arg total_requests "$actual_requests" \
         --arg duration "$duration" \
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_6b_dir/summary.json"
 }

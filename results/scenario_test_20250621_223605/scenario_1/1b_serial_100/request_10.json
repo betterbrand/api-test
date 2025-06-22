@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_10",
+  "status": "0",
+  "duration": "1.232308000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-2a7042824a75e8149172e65bdc953d10",
+    "object": "chat.completion",
+    "created": 1750570596,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence processes by machines, particularly computer systems, enabling tasks such as learning, reasoning, problem-solving, perception, and language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 39,
+      "total_tokens": 541
+    },
+    "system_fingerprint": ""
+  }
+}

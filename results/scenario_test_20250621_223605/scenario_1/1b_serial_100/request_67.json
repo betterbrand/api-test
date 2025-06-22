@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_67",
+  "status": "0",
+  "duration": "1.420320000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-e1bdd3f5098867d98d1dccaa5ce7556c",
+    "object": "chat.completion",
+    "created": 1750570671,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "AI is a field of computer science that focuses on creating systems capable of performing tasks that typically require human intelligence, such as learning, reasoning, problem-solving and understanding natural language."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

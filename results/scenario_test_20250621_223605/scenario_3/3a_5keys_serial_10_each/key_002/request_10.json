@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_10",
+  "status": "0",
+  "duration": "1.180433000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-968e50027fe2142ef3fb813fec0fc908",
+    "object": "chat.completion",
+    "created": 1750570769,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence involves creating systems capable of performing tasks that typically require human intelligence, including learning, decision-making, and pattern recognition."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 27,
+      "total_tokens": 529
+    },
+    "system_fingerprint": ""
+  }
+}

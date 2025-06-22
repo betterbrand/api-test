@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_005_15",
+  "status": "0",
+  "duration": "1.475371000",
+  "model": "gpt-4o-mini",
+  "response": {
+    "id": "chatcmpl-e6e21131593d16de1288e0d7f1174379",
+    "object": "chat.completion",
+    "created": 1750575412,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence refers to the simulation of human intelligence in machines that are programmed to think and learn-like humans. I don't have up to date information about the specific tools and libraries used in the field of artificial intelligence."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 45,
+      "total_tokens": 547
+    },
+    "system_fingerprint": ""
+  }
+}

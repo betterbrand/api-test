@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_001_5",
+  "status": "0",
+  "duration": "60.344181000",
+  "model": "llama-3.1-8b",
+  "error": "No choices in response - likely an error"
+}

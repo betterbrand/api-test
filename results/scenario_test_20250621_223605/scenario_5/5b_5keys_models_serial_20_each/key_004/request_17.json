@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_004_17",
+  "status": "0",
+  "duration": "3.060640000",
+  "model": "llama-3.1-405b",
+  "response": {
+    "id": "e88313926c0841c8b517776a195a8e0a",
+    "object": "chat.completion",
+    "created": 1750575378,
+    "model": "llama-3.1-405b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think, learn, and act like humans, enabling them to perform tasks that typically require human intelligence, such as problem-solving, decision-making, and language processing."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 155,
+      "completion_tokens": 52,
+      "total_tokens": 207
+    },
+    "system_fingerprint": ""
+  }
+}

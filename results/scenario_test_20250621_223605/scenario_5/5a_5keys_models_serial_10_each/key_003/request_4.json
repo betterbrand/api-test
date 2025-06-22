@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_003_4",
+  "status": "0",
+  "duration": ".639500000",
+  "model": "qwen-2.5-coder-32b",
+  "error": "Error in API gateway: Server disconnected without sending a response."
+}

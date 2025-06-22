@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_7",
+  "status": "0",
+  "duration": "1.617060000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-233610c9f262f93840c2a46786184cdb",
+    "object": "chat.completion",
+    "created": 1750570819,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Today, artificial intelligence (AI) leverages advanced algorithms and machine learning to simulate human intelligence, enabling systems to perform complex tasks such as recognizing speech, making decisions, and learning from data, with significant applications in various fields, from healthcare to autonomous vehicles."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 52,
+      "total_tokens": 554
+    },
+    "system_fingerprint": ""
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_96",
+  "status": "0",
+  "duration": "1.019305000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-4d1e818a93f1f6a3adf0ca59eafcbd36",
+    "object": "chat.completion",
+    "created": 1750570710,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I'm sorry, I don't have the information to provide you with a unique sentence."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 19,
+      "total_tokens": 521
+    },
+    "system_fingerprint": ""
+  }
+}

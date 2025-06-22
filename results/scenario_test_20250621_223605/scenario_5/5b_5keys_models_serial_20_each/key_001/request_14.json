@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_14",
+  "status": "0",
+  "duration": "1.092129000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-d7fbadc9c27d8f1423613e397fb2c1ab",
+    "object": "chat.completion",
+    "created": 1750575269,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Current AI technology uses a combination of machine learning algorithms, capable of doing specific tasks by processing large amounts of data."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 24,
+      "total_tokens": 526
+    },
+    "system_fingerprint": ""
+  }
+}

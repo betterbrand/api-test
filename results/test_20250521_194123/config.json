@@ -1,6 +1,0 @@
-{
-  "timestamp": "2025-05-21T19:41:23-07:00",
-  "api_endpoint": "[2025-05-21 19:41:23] [INFO] Determining API endpoint from https://openbeta.kyletest.com/test\n[2025-05-21 19:41:23] [INFO] Found API endpoint: https://api.mor.org/api/v1/chat/completions\nhttps://api.mor.org/api/v1/chat/completions",
-  "max_concurrent_requests": 100,
-  "verbose_output": 1
-}

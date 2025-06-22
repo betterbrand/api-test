@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_3",
+  "status": "0",
+  "duration": "1.118355000",
+  "model": "qwen-2.5-coder-32b",
+  "response": {
+    "id": "chatcmpl-c3b7bb4e1c2c21de4d5651d62fdf41e4",
+    "object": "chat.completion",
+    "created": 1750575308,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence (AI) involves creating computer systems capable of performing tasks that typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

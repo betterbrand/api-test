@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_6",
+  "status": "0",
+  "duration": "3.046884000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-4cd02d02d7c62abc553f5cb0ffc454cd",
+    "object": "chat.completion",
+    "created": 1750575422,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence (AI) is a broad field of computer science dedicated to creating machines that can perform tasks typically requiring human intelligence, such as learning, problem-solving, perception, language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 39,
+      "total_tokens": 541
+    },
+    "system_fingerprint": ""
+  }
+}
