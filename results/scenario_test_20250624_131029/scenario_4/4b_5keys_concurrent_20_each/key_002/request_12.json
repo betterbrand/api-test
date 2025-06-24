@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_12",
+  "status": "0",
+  "duration": "3.736941000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-f9924e0427c844d18298590b78112086",
+    "object": "chat.completion",
+    "created": 1750796180,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence (AI) involves creating computer systems that can perform tasks that typically require human intelligence, including learning, problem-solving, perception and language understanding but in an autonomous way."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 37,
+      "total_tokens": 539
+    },
+    "system_fingerprint": ""
+  }
+}

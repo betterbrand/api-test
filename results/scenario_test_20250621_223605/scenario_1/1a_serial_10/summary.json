@@ -1,6 +1,0 @@
-{
-  "scenario": "1a",
-  "description": "Single key, 10 serial requests",
-  "total_requests": 10,
-  "duration": 17.907611000
-}

@@ -1,6 +1,0 @@
-{
-  "scenario": "4a",
-  "description": "5 keys, 10 concurrent requests per key (50 total)",
-  "total_requests": 50,
-  "duration": 121.488850000
-}

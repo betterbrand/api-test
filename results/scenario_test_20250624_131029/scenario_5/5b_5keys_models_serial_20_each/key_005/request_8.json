@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_005_8",
+  "status": "0",
+  "duration": "1.871699000",
+  "model": "gpt-4o-mini",
+  "response": {
+    "id": "chatcmpl-164e4d1fb4414b2b94714706cefca060",
+    "object": "chat.completion",
+    "created": 1750798759,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I don't have the information. Normally, I would define it as a broad field of computer science dedicated to creating smart machines capable of performing tasks that typically require human intelligence. These tasks include, among others, learning, problem-solving, perception, language understanding, and decision-making. However, here I do not have the full context."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 68,
+      "total_tokens": 570
+    },
+    "system_fingerprint": ""
+  }
+}

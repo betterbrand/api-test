@@ -626,11 +626,11 @@ run_scenario_6() {
         '{scenario: $scenario, description: $description, total_requests: $total_requests | tonumber, duration: $duration | tonumber}' > "$scenario_6b_dir/summary.json"
 }
 
-# Generate comprehensive report
+# Generate comprehensive report with dynamic error details
 generate_report() {
     local test_dir="$1"
     
-    log_info "Generating comprehensive test report"
+    log_info "Generating comprehensive test report with dynamic error analysis"
     
     # Collect all scenario summaries
     local all_summaries=""
@@ -652,8 +652,10 @@ generate_report() {
     local total_requests=0
     local total_successful=0
     local total_failed=0
+    local error_summary=""
     
-    for request_file in $(find "$test_dir" -name "request_*.json"); do
+    # Analyze all request files for errors
+    for request_file in $(find "$test_dir" -name "request_*.json" | sort); do
         total_requests=$((total_requests + 1))
         if grep -q '"error":' "$request_file"; then
             total_failed=$((total_failed + 1))
@@ -662,56 +664,114 @@ generate_report() {
         fi
     done
     
+    # Calculate success rate
+    local success_rate=0
+    if [ $total_requests -gt 0 ]; then
+        success_rate=$(echo "scale=2; $total_successful * 100 / $total_requests" | bc -l 2>/dev/null || echo 0)
+    fi
+    
     # Generate HTML report
     cat > "$test_dir/scenario_report.html" << EOF
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Morpheus API Scenario Test Report</title>
+    <title>Morpheus API Scenario Test Report - Dynamic Error Analysis</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1, h2 { color: #333; }
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
         .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        .scenario { background: #f9f9f9; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .critical-error { background: #ffebee; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #f44336; }
+        .scenario-section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-left: 4px solid #007cba; border-radius: 5px; }
+        .error-detail { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; font-size: 0.9em; border-left: 3px solid #ffc107; }
+        .request-error { background: #ffebee; padding: 8px; margin: 5px 0; border-radius: 3px; font-size: 0.85em; }
         .success { color: green; font-weight: bold; }
         .failure { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         tr:nth-child(even) { background-color: #f9f9f9; }
+        .error-count { background: #ffcdd2; padding: 5px; border-radius: 3px; }
+        .collapsible { background-color: #e3f2fd; color: #000; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; border-radius: 5px; margin: 5px 0; }
+        .collapsible:hover { background-color: #bbdefb; }
+        .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f1f8ff; }
+        .expanded { display: block; }
     </style>
+    <script>
+        function toggleContent(element) {
+            var content = element.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                element.innerHTML = element.innerHTML.replace("▼", "▶");
+            } else {
+                content.style.display = "block";
+                element.innerHTML = element.innerHTML.replace("▶", "▼");
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Morpheus API Scenario Test Report</h1>
+    <h1>🚨 Morpheus API Scenario Test Report - Dynamic Error Analysis</h1>
     
     <div class="summary">
         <h2>Overall Test Summary</h2>
-        <p>Test conducted on: <strong>$(date '+%Y-%m-%d %H:%M:%S')</strong></p>
-        <p>Total requests across all scenarios: <strong>$total_requests</strong></p>
-        <p>Successful requests: <strong class="success">$total_successful</strong></p>
-        <p>Failed requests: <strong class="failure">$total_failed</strong></p>
-        <p>Success rate: <strong>$(echo "scale=2; $total_successful * 100 / $total_requests" | bc -l 2>/dev/null || echo 0)%</strong></p>
+        <p><strong>Test Date:</strong> $(date '+%Y-%m-%d %H:%M:%S')</p>
+        <p><strong>Total Scenarios:</strong> $(echo "[$all_summaries]" | jq '. | length')</p>
+        <p><strong>Total Requests:</strong> $total_requests</p>
+        <p><strong>Successful Requests:</strong> <span class="success">$total_successful</span></p>
+        <p><strong>Failed Requests:</strong> <span class="failure">$total_failed</span></p>
+        <p><strong>Success Rate:</strong> <span class="$([ $(echo "$success_rate > 80" | bc -l 2>/dev/null || echo 0) -eq 1 ] && echo "success" || echo "failure")">$success_rate%</span></p>
     </div>
+EOF
+
+    # Add critical alert if success rate is low
+    if [ $(echo "$success_rate < 50" | bc -l 2>/dev/null || echo 1) -eq 1 ]; then
+        cat >> "$test_dir/scenario_report.html" << EOF
+    <div class="critical-error">
+        <h2>🔥 Critical System Alert</h2>
+        <p><strong>WARNING:</strong> Success rate below 50% indicates significant system issues</p>
+        <p><strong>Impact:</strong> $([ $total_successful -eq 0 ] && echo "Complete system failure - no requests successful" || echo "Partial system failure - reliability compromised")</p>
+    </div>
+EOF
+    fi
     
-    <h2>Scenario Results</h2>
+    cat >> "$test_dir/scenario_report.html" << EOF
+    <h2>📊 Scenario Performance Overview</h2>
     
     <table>
         <tr>
             <th>Scenario</th>
             <th>Description</th>
-            <th>Total Requests</th>
-            <th>Duration (seconds)</th>
-            <th>Requests/Second</th>
+            <th>Requests</th>
+            <th>Duration (s)</th>
+            <th>Rate (req/s)</th>
+            <th>Success Rate</th>
         </tr>
 EOF
 
-    # Add scenario rows to the table
+    # Add scenario rows to the table with success rate calculation
     echo "[$all_summaries]" | jq -c '.[]' | while read -r scenario; do
         local scenario_id=$(echo "$scenario" | jq -r '.scenario')
         local description=$(echo "$scenario" | jq -r '.description')
         local total_req=$(echo "$scenario" | jq -r '.total_requests')
         local duration=$(echo "$scenario" | jq -r '.duration')
         local rps=$(echo "scale=2; $total_req / $duration" | bc -l 2>/dev/null || echo 0)
+        
+        # Calculate success rate for this scenario
+        local scenario_successful=0
+        local scenario_failed=0
+        for request_file in $(find "$test_dir" -path "*${scenario_id}_*" -name "request_*.json" 2>/dev/null); do
+            if grep -q '"error":' "$request_file"; then
+                scenario_failed=$((scenario_failed + 1))
+            else
+                scenario_successful=$((scenario_successful + 1))
+            fi
+        done
+        
+        local scenario_success_rate=0
+        if [ $total_req -gt 0 ]; then
+            scenario_success_rate=$(echo "scale=1; $scenario_successful * 100 / $total_req" | bc -l 2>/dev/null || echo 0)
+        fi
         
         cat >> "$test_dir/scenario_report.html" << EOF
         <tr>
@@ -720,6 +780,7 @@ EOF
             <td>$total_req</td>
             <td>$duration</td>
             <td>$rps</td>
+            <td class="$([ $(echo "$scenario_success_rate > 80" | bc -l 2>/dev/null || echo 0) -eq 1 ] && echo "success" || echo "failure")">$scenario_success_rate%</td>
         </tr>
 EOF
     done
@@ -727,29 +788,176 @@ EOF
     cat >> "$test_dir/scenario_report.html" << EOF
     </table>
     
-    <h2>Scenario Details</h2>
+    <h2>🔍 Detailed Scenario Analysis with Error Breakdown</h2>
 EOF
 
-    # Add detailed scenario information
+    # Generate detailed scenario analysis with dynamic error reporting
     echo "[$all_summaries]" | jq -c '.[]' | while read -r scenario; do
         local scenario_id=$(echo "$scenario" | jq -r '.scenario')
         local description=$(echo "$scenario" | jq -r '.description')
+        local total_req=$(echo "$scenario" | jq -r '.total_requests')
+        local duration=$(echo "$scenario" | jq -r '.duration')
+        
+        # Find all request files for this scenario
+        local scenario_requests=($(find "$test_dir" -path "*${scenario_id}_*" -name "request_*.json" 2>/dev/null | sort))
+        
+        # Count successes and failures for this scenario
+        local scenario_successful=0
+        local scenario_failed=0
+        local error_types=()
+        local error_samples=()
+        
+        for request_file in "${scenario_requests[@]}"; do
+            if grep -q '"error":' "$request_file"; then
+                scenario_failed=$((scenario_failed + 1))
+                local error_msg=$(jq -r '.error // "Unknown error"' "$request_file" 2>/dev/null | head -1)
+                error_samples+=("$error_msg")
+            else
+                scenario_successful=$((scenario_successful + 1))
+            fi
+        done
+        
+        local scenario_success_rate=0
+        if [ $total_req -gt 0 ]; then
+            scenario_success_rate=$(echo "scale=1; $scenario_successful * 100 / $total_req" | bc -l 2>/dev/null || echo 0)
+        fi
         
         cat >> "$test_dir/scenario_report.html" << EOF
-    <div class="scenario">
-        <h3>Scenario $scenario_id</h3>
-        <p><strong>Description:</strong> $description</p>
+    <div class="scenario-section">
+        <h3>Scenario $scenario_id: $(echo "$description" | sed 's/^./\U&/')</h3>
         <p><strong>Purpose:</strong> $(get_scenario_purpose "$scenario_id")</p>
+        <p><strong>Results:</strong> 
+            <span class="$([ $scenario_successful -gt 0 ] && echo "success" || echo "failure")">$scenario_successful successful</span> / 
+            <span class="$([ $scenario_failed -eq 0 ] && echo "success" || echo "failure")">$scenario_failed failed</span> 
+            ($scenario_success_rate% success rate)
+        </p>
+        <p><strong>Performance:</strong> $total_req requests in ${duration}s ($(echo "scale=2; $total_req / $duration" | bc -l 2>/dev/null || echo 0) req/s)</p>
+EOF
+
+        # Add error details if there are failures
+        if [ $scenario_failed -gt 0 ]; then
+            cat >> "$test_dir/scenario_report.html" << EOF
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details ($scenario_failed errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+EOF
+
+            # Group and display errors
+            if [ ${#error_samples[@]} -gt 0 ]; then
+                # Create a temporary file to properly handle multi-line errors
+                local temp_errors=$(mktemp)
+                printf '%s\n' "${error_samples[@]}" | sort > "$temp_errors"
+                
+                # Get unique errors with counts
+                while IFS= read -r unique_error; do
+                    if [ -n "$unique_error" ] && [ "$unique_error" != "null" ]; then
+                        local error_count=$(grep -Fx "$unique_error" "$temp_errors" | wc -l)
+                        cat >> "$test_dir/scenario_report.html" << EOF
+            <div class="error-detail">
+                <strong>Error ($error_count occurrences):</strong><br>
+                $(echo "$unique_error" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+            </div>
+EOF
+                    fi
+                done < <(sort "$temp_errors" | uniq)
+                
+                rm -f "$temp_errors"
+            fi
+            
+            # Show individual request failures
+            cat >> "$test_dir/scenario_report.html" << EOF
+            <h4>Individual Request Failures:</h4>
+EOF
+            
+            local request_count=0
+            for request_file in "${scenario_requests[@]}"; do
+                if grep -q '"error":' "$request_file"; then
+                    request_count=$((request_count + 1))
+                    local conv_id=$(jq -r '.conversation_id // "unknown"' "$request_file" 2>/dev/null)
+                    local request_duration=$(jq -r '.duration // "unknown"' "$request_file" 2>/dev/null)
+                    local model=$(jq -r '.model // "default"' "$request_file" 2>/dev/null)
+                    local error_msg=$(jq -r '.error // "Unknown error"' "$request_file" 2>/dev/null)
+                    local filename=$(basename "$request_file")
+                    
+                    cat >> "$test_dir/scenario_report.html" << EOF
+            <div class="request-error">
+                <strong>Request $request_count ($filename):</strong><br>
+                • Conversation ID: $conv_id<br>
+                • Model: $model<br>
+                • Duration: ${request_duration}s<br>
+                • Error: $(echo "$error_msg" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' | cut -c1-200)$([ ${#error_msg} -gt 200 ] && echo "...")
+            </div>
+EOF
+                fi
+            done
+            
+            cat >> "$test_dir/scenario_report.html" << EOF
+        </div>
+EOF
+        fi
+        
+        cat >> "$test_dir/scenario_report.html" << EOF
     </div>
 EOF
     done
     
+    # Add summary recommendations
     cat >> "$test_dir/scenario_report.html" << EOF
+    
+    <h2>📋 Summary & Recommendations</h2>
+    
+    <div class="scenario-section">
+        <h3>Test Results Summary</h3>
+        <p>This test analyzed <strong>$total_requests</strong> total API requests across multiple scenarios.</p>
+        $(if [ $total_failed -gt 0 ]; then
+            echo "<p class=\"warning\"><strong>Issues Detected:</strong> $total_failed requests failed ($total_successful successful). This indicates potential API reliability issues.</p>"
+            if [ $total_successful -eq 0 ]; then
+                echo "<p class=\"failure\"><strong>Critical:</strong> Zero successful requests suggests complete API infrastructure failure.</p>"
+            fi
+        else
+            echo "<p class=\"success\"><strong>All requests successful!</strong> API is performing well under all tested load scenarios.</p>"
+        fi)
+        
+        <h4>Key Findings:</h4>
+        <ul>
+EOF
+
+    # Generate dynamic recommendations based on results
+    if [ $total_failed -gt 0 ]; then
+        cat >> "$test_dir/scenario_report.html" << EOF
+            <li>API reliability issues detected - $total_failed out of $total_requests requests failed</li>
+            <li>Success rate of $success_rate% $([ $(echo "$success_rate < 90" | bc -l 2>/dev/null || echo 1) -eq 1 ] && echo "is below recommended 90% threshold")</li>
+EOF
+        if [ $total_successful -eq 0 ]; then
+            cat >> "$test_dir/scenario_report.html" << EOF
+            <li style="color: red;"><strong>Critical Infrastructure Failure:</strong> No successful requests across any scenario</li>
+            <li style="color: red;"><strong>Immediate Action Required:</strong> Complete system investigation needed</li>
+EOF
+        fi
+    else
+        cat >> "$test_dir/scenario_report.html" << EOF
+            <li style="color: green;">Excellent API reliability - 100% success rate across all scenarios</li>
+            <li style="color: green;">All load patterns (serial, concurrent, multi-key, multi-model) performing well</li>
+EOF
+    fi
+    
+    cat >> "$test_dir/scenario_report.html" << EOF
+        </ul>
+    </div>
+    
+    <div class="summary">
+        <h3>Test Metadata</h3>
+        <p><strong>Test Directory:</strong> $test_dir</p>
+        <p><strong>Report Generated:</strong> $(date)</p>
+        <p><strong>Total Test Duration:</strong> $(find "$test_dir" -name "summary.json" -exec jq -r '.duration' {} \; | awk '{sum += $1} END {printf "%.2f seconds", sum}')</p>
+    </div>
+    
 </body>
 </html>
 EOF
 
-    log_info "HTML report generated at $test_dir/scenario_report.html"
+    log_info "Comprehensive HTML report with dynamic error analysis generated at $test_dir/scenario_report.html"
 }
 
 # Get scenario purpose description

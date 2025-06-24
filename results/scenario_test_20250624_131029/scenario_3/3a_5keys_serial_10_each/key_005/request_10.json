@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_005_10",
+  "status": "0",
+  "duration": ".427876000",
+  "model": "default",
+  "error": "Error in API gateway: Server disconnected without sending a response."
+}

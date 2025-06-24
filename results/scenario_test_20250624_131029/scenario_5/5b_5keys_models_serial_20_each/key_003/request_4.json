@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_4",
+  "status": "0",
+  "duration": "1.223019000",
+  "model": "qwen-2.5-coder-32b",
+  "response": {
+    "id": "chatcmpl-9872d3c01ebc4681824be8826311db71",
+    "object": "chat.completion",
+    "created": 1750798671,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I'm sorry, I'm unable to assist with that because I don't have current access to the tools necessary to provide an accurate and up-to-date response to your question."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

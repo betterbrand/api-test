@@ -1,0 +1,3343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Morpheus API Scenario Test Report - Dynamic Error Analysis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
+        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .critical-error { background: #ffebee; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #f44336; }
+        .scenario-section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-left: 4px solid #007cba; border-radius: 5px; }
+        .error-detail { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; font-size: 0.9em; border-left: 3px solid #ffc107; }
+        .request-error { background: #ffebee; padding: 8px; margin: 5px 0; border-radius: 3px; font-size: 0.85em; }
+        .success { color: green; font-weight: bold; }
+        .failure { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .error-count { background: #ffcdd2; padding: 5px; border-radius: 3px; }
+        .collapsible { background-color: #e3f2fd; color: #000; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; border-radius: 5px; margin: 5px 0; }
+        .collapsible:hover { background-color: #bbdefb; }
+        .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f1f8ff; }
+        .expanded { display: block; }
+    </style>
+    <script>
+        function toggleContent(element) {
+            var content = element.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                element.innerHTML = element.innerHTML.replace("▼", "▶");
+            } else {
+                content.style.display = "block";
+                element.innerHTML = element.innerHTML.replace("▶", "▼");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>🚨 Morpheus API Scenario Test Report - Dynamic Error Analysis</h1>
+    
+    <div class="summary">
+        <h2>Overall Test Summary</h2>
+        <p><strong>Test Date:</strong> 2025-06-24 14:00:27</p>
+        <p><strong>Total Scenarios:</strong> 12</p>
+        <p><strong>Total Requests:</strong> 820</p>
+        <p><strong>Successful Requests:</strong> <span class="success">418</span></p>
+        <p><strong>Failed Requests:</strong> <span class="failure">402</span></p>
+        <p><strong>Success Rate:</strong> <span class="failure">50.97%</span></p>
+    </div>
+    <h2>📊 Scenario Performance Overview</h2>
+    
+    <table>
+        <tr>
+            <th>Scenario</th>
+            <th>Description</th>
+            <th>Requests</th>
+            <th>Duration (s)</th>
+            <th>Rate (req/s)</th>
+            <th>Success Rate</th>
+        </tr>
+        <tr>
+            <td>1a</td>
+            <td>Single key, 10 serial requests</td>
+            <td>10</td>
+            <td>24.419281000</td>
+            <td>.40</td>
+            <td class="success">100.0%</td>
+        </tr>
+        <tr>
+            <td>1b</td>
+            <td>Single key, 100 serial requests</td>
+            <td>100</td>
+            <td>134.461687000</td>
+            <td>.74</td>
+            <td class="success">100.0%</td>
+        </tr>
+        <tr>
+            <td>2a</td>
+            <td>Single key, 10 concurrent requests</td>
+            <td>10</td>
+            <td>2.289103000</td>
+            <td>4.36</td>
+            <td class="success">100.0%</td>
+        </tr>
+        <tr>
+            <td>2b</td>
+            <td>Single key, 100 concurrent requests</td>
+            <td>100</td>
+            <td>4.995524000</td>
+            <td>20.01</td>
+            <td class="failure">55.0%</td>
+        </tr>
+        <tr>
+            <td>3a</td>
+            <td>5 keys, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>27.402959000</td>
+            <td>1.82</td>
+            <td class="failure">0%</td>
+        </tr>
+        <tr>
+            <td>3b</td>
+            <td>5 keys, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>147.576752000</td>
+            <td>.67</td>
+            <td class="failure">71.0%</td>
+        </tr>
+        <tr>
+            <td>4a</td>
+            <td>5 keys, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>5.230423000</td>
+            <td>9.55</td>
+            <td class="success">82.0%</td>
+        </tr>
+        <tr>
+            <td>4b</td>
+            <td>5 keys, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>7.221355000</td>
+            <td>13.84</td>
+            <td class="failure">15.0%</td>
+        </tr>
+        <tr>
+            <td>5a</td>
+            <td>5 keys with different models, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>1466.507087000</td>
+            <td>.03</td>
+            <td class="failure">0%</td>
+        </tr>
+        <tr>
+            <td>5b</td>
+            <td>5 keys with different models, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>1128.099333000</td>
+            <td>.08</td>
+            <td class="failure">76.0%</td>
+        </tr>
+        <tr>
+            <td>6a</td>
+            <td>5 keys with different models, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>29.978927000</td>
+            <td>1.66</td>
+            <td class="failure">80.0%</td>
+        </tr>
+        <tr>
+            <td>6b</td>
+            <td>5 keys with different models, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>16.983392000</td>
+            <td>5.88</td>
+            <td class="failure">0%</td>
+        </tr>
+    </table>
+    
+    <h2>🔍 Detailed Scenario Analysis with Error Breakdown</h2>
+    <div class="scenario-section">
+        <h3>Scenario 1a: USingle key, 10 serial requests</h3>
+        <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">10 successful</span> / 
+            <span class="success">0 failed</span> 
+            (100.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 10 requests in 24.419281000s (.40 req/s)</p>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 1b: USingle key, 100 serial requests</h3>
+        <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">100 successful</span> / 
+            <span class="success">0 failed</span> 
+            (100.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 134.461687000s (.74 req/s)</p>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 2a: USingle key, 10 concurrent requests</h3>
+        <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">10 successful</span> / 
+            <span class="success">0 failed</span> 
+            (100.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 10 requests in 2.289103000s (4.36 req/s)</p>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 2b: USingle key, 100 concurrent requests</h3>
+        <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">55 successful</span> / 
+            <span class="failure">45 failed</span> 
+            (55.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 4.995524000s (20.01 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (45 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (       6 occurrences):</strong><br>
+                Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="error-detail">
+                <strong>Error (      23 occurrences):</strong><br>
+                Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_100.json):</strong><br>
+                • Conversation ID: conv_key_001_100<br>
+                • Model: default<br>
+                • Duration: 2.948985000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_001_12<br>
+                • Model: default<br>
+                • Duration: 3.633073000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_28.json):</strong><br>
+                • Conversation ID: conv_key_001_28<br>
+                • Model: default<br>
+                • Duration: 4.369350000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_36.json):</strong><br>
+                • Conversation ID: conv_key_001_36<br>
+                • Model: default<br>
+                • Duration: 2.983788000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: default<br>
+                • Duration: 3.641655000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_40.json):</strong><br>
+                • Conversation ID: conv_key_001_40<br>
+                • Model: default<br>
+                • Duration: 4.355872000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_42.json):</strong><br>
+                • Conversation ID: conv_key_001_42<br>
+                • Model: default<br>
+                • Duration: 4.343216000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_44.json):</strong><br>
+                • Conversation ID: conv_key_001_44<br>
+                • Model: default<br>
+                • Duration: 4.354763000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_49.json):</strong><br>
+                • Conversation ID: conv_key_001_49<br>
+                • Model: default<br>
+                • Duration: 3.688043000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_50.json):</strong><br>
+                • Conversation ID: conv_key_001_50<br>
+                • Model: default<br>
+                • Duration: 4.325981000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_51.json):</strong><br>
+                • Conversation ID: conv_key_001_51<br>
+                • Model: default<br>
+                • Duration: 4.351123000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_52.json):</strong><br>
+                • Conversation ID: conv_key_001_52<br>
+                • Model: default<br>
+                • Duration: 3.023613000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_55.json):</strong><br>
+                • Conversation ID: conv_key_001_55<br>
+                • Model: default<br>
+                • Duration: 4.273399000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_56.json):</strong><br>
+                • Conversation ID: conv_key_001_56<br>
+                • Model: default<br>
+                • Duration: 3.799461000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_57.json):</strong><br>
+                • Conversation ID: conv_key_001_57<br>
+                • Model: default<br>
+                • Duration: 3.642038000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_58.json):</strong><br>
+                • Conversation ID: conv_key_001_58<br>
+                • Model: default<br>
+                • Duration: 3.148831000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_60.json):</strong><br>
+                • Conversation ID: conv_key_001_60<br>
+                • Model: default<br>
+                • Duration: 4.280846000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_61.json):</strong><br>
+                • Conversation ID: conv_key_001_61<br>
+                • Model: default<br>
+                • Duration: 3.193602000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_62.json):</strong><br>
+                • Conversation ID: conv_key_001_62<br>
+                • Model: default<br>
+                • Duration: 2.975175000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_63.json):</strong><br>
+                • Conversation ID: conv_key_001_63<br>
+                • Model: default<br>
+                • Duration: 4.276985000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_64.json):</strong><br>
+                • Conversation ID: conv_key_001_64<br>
+                • Model: default<br>
+                • Duration: 4.200807000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_66.json):</strong><br>
+                • Conversation ID: conv_key_001_66<br>
+                • Model: default<br>
+                • Duration: 4.198181000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_67.json):</strong><br>
+                • Conversation ID: conv_key_001_67<br>
+                • Model: default<br>
+                • Duration: 4.233424000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_70.json):</strong><br>
+                • Conversation ID: conv_key_001_70<br>
+                • Model: default<br>
+                • Duration: 4.195386000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_71.json):</strong><br>
+                • Conversation ID: conv_key_001_71<br>
+                • Model: default<br>
+                • Duration: 4.216664000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_72.json):</strong><br>
+                • Conversation ID: conv_key_001_72<br>
+                • Model: default<br>
+                • Duration: 4.218213000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_77.json):</strong><br>
+                • Conversation ID: conv_key_001_77<br>
+                • Model: default<br>
+                • Duration: 3.216147000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_78.json):</strong><br>
+                • Conversation ID: conv_key_001_78<br>
+                • Model: default<br>
+                • Duration: 3.413510000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_80.json):</strong><br>
+                • Conversation ID: conv_key_001_80<br>
+                • Model: default<br>
+                • Duration: 3.395661000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 30 (request_82.json):</strong><br>
+                • Conversation ID: conv_key_001_82<br>
+                • Model: default<br>
+                • Duration: 4.118792000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 31 (request_83.json):</strong><br>
+                • Conversation ID: conv_key_001_83<br>
+                • Model: default<br>
+                • Duration: 3.034801000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 32 (request_84.json):</strong><br>
+                • Conversation ID: conv_key_001_84<br>
+                • Model: default<br>
+                • Duration: 3.161212000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 33 (request_85.json):</strong><br>
+                • Conversation ID: conv_key_001_85<br>
+                • Model: default<br>
+                • Duration: 3.152594000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 34 (request_86.json):</strong><br>
+                • Conversation ID: conv_key_001_86<br>
+                • Model: default<br>
+                • Duration: 3.194761000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 35 (request_87.json):</strong><br>
+                • Conversation ID: conv_key_001_87<br>
+                • Model: default<br>
+                • Duration: 4.100467000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 36 (request_88.json):</strong><br>
+                • Conversation ID: conv_key_001_88<br>
+                • Model: default<br>
+                • Duration: 2.988315000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 37 (request_89.json):</strong><br>
+                • Conversation ID: conv_key_001_89<br>
+                • Model: default<br>
+                • Duration: 3.590352000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 38 (request_90.json):</strong><br>
+                • Conversation ID: conv_key_001_90<br>
+                • Model: default<br>
+                • Duration: 3.203343000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 39 (request_92.json):</strong><br>
+                • Conversation ID: conv_key_001_92<br>
+                • Model: default<br>
+                • Duration: 3.573858000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 40 (request_93.json):</strong><br>
+                • Conversation ID: conv_key_001_93<br>
+                • Model: default<br>
+                • Duration: 2.776176000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 41 (request_95.json):</strong><br>
+                • Conversation ID: conv_key_001_95<br>
+                • Model: default<br>
+                • Duration: 4.086610000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 42 (request_96.json):</strong><br>
+                • Conversation ID: conv_key_001_96<br>
+                • Model: default<br>
+                • Duration: 4.057520000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 43 (request_97.json):</strong><br>
+                • Conversation ID: conv_key_001_97<br>
+                • Model: default<br>
+                • Duration: 3.979779000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 44 (request_98.json):</strong><br>
+                • Conversation ID: conv_key_001_98<br>
+                • Model: default<br>
+                • Duration: 4.076876000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 45 (request_99.json):</strong><br>
+                • Conversation ID: conv_key_001_99<br>
+                • Model: default<br>
+                • Duration: 4.024199000s<br>
+                • Error: 
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 3a: U5 keys, 10 serial requests per key (50 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+        <p><strong>Results:</strong> 
+            <span class="failure">0 successful</span> / 
+            <span class="failure">50 failed</span> 
+            (0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 50 requests in 27.402959000s (1.82 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (50 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      44 occurrences):</strong><br>
+                Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: default<br>
+                • Duration: .324713000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: default<br>
+                • Duration: .422724000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: default<br>
+                • Duration: .302103000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: default<br>
+                • Duration: .306376000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: default<br>
+                • Duration: .364001000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: default<br>
+                • Duration: .298691000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: default<br>
+                • Duration: .295411000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: default<br>
+                • Duration: .471211000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: default<br>
+                • Duration: .437647000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: default<br>
+                • Duration: .446914000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: default<br>
+                • Duration: .422736000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_002_10<br>
+                • Model: default<br>
+                • Duration: .432370000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: default<br>
+                • Duration: .436081000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: default<br>
+                • Duration: .413673000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: default<br>
+                • Duration: .481359000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_002_5<br>
+                • Model: default<br>
+                • Duration: .598944000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_002_6<br>
+                • Model: default<br>
+                • Duration: .630722000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_002_7<br>
+                • Model: default<br>
+                • Duration: .634708000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_002_8<br>
+                • Model: default<br>
+                • Duration: .645143000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_002_9<br>
+                • Model: default<br>
+                • Duration: .438908000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_003_1<br>
+                • Model: default<br>
+                • Duration: .474521000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_003_10<br>
+                • Model: default<br>
+                • Duration: .480140000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_003_2<br>
+                • Model: default<br>
+                • Duration: .401209000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_003_3<br>
+                • Model: default<br>
+                • Duration: .426070000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_003_4<br>
+                • Model: default<br>
+                • Duration: .424085000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_003_5<br>
+                • Model: default<br>
+                • Duration: .430709000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_003_6<br>
+                • Model: default<br>
+                • Duration: .423862000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_003_7<br>
+                • Model: default<br>
+                • Duration: .429303000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_003_8<br>
+                • Model: default<br>
+                • Duration: .439443000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 30 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_003_9<br>
+                • Model: default<br>
+                • Duration: .452720000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 31 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_004_1<br>
+                • Model: default<br>
+                • Duration: .406808000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 32 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_004_10<br>
+                • Model: default<br>
+                • Duration: .492180000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 33 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_004_2<br>
+                • Model: default<br>
+                • Duration: .439350000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 34 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_004_3<br>
+                • Model: default<br>
+                • Duration: .401184000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 35 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_004_4<br>
+                • Model: default<br>
+                • Duration: .416675000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 36 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_004_5<br>
+                • Model: default<br>
+                • Duration: .444397000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 37 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_004_6<br>
+                • Model: default<br>
+                • Duration: .402787000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 38 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_004_7<br>
+                • Model: default<br>
+                • Duration: .456637000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 39 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_004_8<br>
+                • Model: default<br>
+                • Duration: .451038000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 40 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_004_9<br>
+                • Model: default<br>
+                • Duration: .474471000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 41 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_005_1<br>
+                • Model: default<br>
+                • Duration: 1.624980000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 42 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: default<br>
+                • Duration: .427876000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 43 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: default<br>
+                • Duration: .991914000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 44 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: default<br>
+                • Duration: .418816000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 45 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_005_4<br>
+                • Model: default<br>
+                • Duration: .431310000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 46 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: default<br>
+                • Duration: .474881000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 47 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: default<br>
+                • Duration: .457054000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 48 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: default<br>
+                • Duration: .452005000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 49 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: default<br>
+                • Duration: .436255000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 50 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: default<br>
+                • Duration: .444648000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 3b: U5 keys, 20 serial requests per key (100 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+        <p><strong>Results:</strong> 
+            <span class="success">71 successful</span> / 
+            <span class="failure">29 failed</span> 
+            (71.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 147.576752000s (.67 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (29 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      29 occurrences):</strong><br>
+                Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: default<br>
+                • Duration: .428928000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: default<br>
+                • Duration: .423531000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_001_11<br>
+                • Model: default<br>
+                • Duration: .416555000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_001_12<br>
+                • Model: default<br>
+                • Duration: .417866000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_001_13<br>
+                • Model: default<br>
+                • Duration: .719749000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_001_14<br>
+                • Model: default<br>
+                • Duration: .691938000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_001_15<br>
+                • Model: default<br>
+                • Duration: .635986000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_001_16<br>
+                • Model: default<br>
+                • Duration: .654495000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_001_17<br>
+                • Model: default<br>
+                • Duration: .643764000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_001_18<br>
+                • Model: default<br>
+                • Duration: .518187000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_001_19<br>
+                • Model: default<br>
+                • Duration: .435214000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: default<br>
+                • Duration: .410603000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_001_20<br>
+                • Model: default<br>
+                • Duration: .425804000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: default<br>
+                • Duration: .440438000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: default<br>
+                • Duration: .465860000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: default<br>
+                • Duration: .421979000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: default<br>
+                • Duration: .430012000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: default<br>
+                • Duration: .457597000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: default<br>
+                • Duration: .426665000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: default<br>
+                • Duration: .403611000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: default<br>
+                • Duration: .416447000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: default<br>
+                • Duration: .437486000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: default<br>
+                • Duration: .640042000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: default<br>
+                • Duration: .530427000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_002_5<br>
+                • Model: default<br>
+                • Duration: .420850000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_002_6<br>
+                • Model: default<br>
+                • Duration: .464221000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_002_7<br>
+                • Model: default<br>
+                • Duration: .418231000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_002_8<br>
+                • Model: default<br>
+                • Duration: .411866000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_002_9<br>
+                • Model: default<br>
+                • Duration: .388500000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 4a: U5 keys, 10 concurrent requests per key (50 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+        <p><strong>Results:</strong> 
+            <span class="success">41 successful</span> / 
+            <span class="failure">9 failed</span> 
+            (82.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 50 requests in 5.230423000s (9.55 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (9 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (       9 occurrences):</strong><br>
+                Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_004_9<br>
+                • Model: default<br>
+                • Duration: 3.027435000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: default<br>
+                • Duration: 2.440028000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: default<br>
+                • Duration: 2.896454000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: default<br>
+                • Duration: 2.770407000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: default<br>
+                • Duration: 2.596851000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: default<br>
+                • Duration: 2.621664000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: default<br>
+                • Duration: 2.537943000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: default<br>
+                • Duration: 2.495973000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: default<br>
+                • Duration: 2.458482000s<br>
+                • Error: Error in API gateway: Expecting value: line 1 column 1 (char 0)
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 4b: U5 keys, 20 concurrent requests per key (100 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+        <p><strong>Results:</strong> 
+            <span class="success">15 successful</span> / 
+            <span class="failure">85 failed</span> 
+            (15.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 7.221355000s (13.84 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (85 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      41 occurrences):</strong><br>
+                Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: default<br>
+                • Duration: 1.039024000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: default<br>
+                • Duration: 1.120369000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_001_11<br>
+                • Model: default<br>
+                • Duration: 2.123375000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_001_12<br>
+                • Model: default<br>
+                • Duration: 2.085801000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_001_13<br>
+                • Model: default<br>
+                • Duration: .975266000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_001_14<br>
+                • Model: default<br>
+                • Duration: 1.464128000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_001_15<br>
+                • Model: default<br>
+                • Duration: 1.365874000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_001_16<br>
+                • Model: default<br>
+                • Duration: 1.461777000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_001_17<br>
+                • Model: default<br>
+                • Duration: 1.468575000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_001_18<br>
+                • Model: default<br>
+                • Duration: .797760000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_001_19<br>
+                • Model: default<br>
+                • Duration: 2.016289000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: default<br>
+                • Duration: .784599000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_001_20<br>
+                • Model: default<br>
+                • Duration: 1.574822000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: default<br>
+                • Duration: 1.499169000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: default<br>
+                • Duration: .720137000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: default<br>
+                • Duration: 2.513648000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: default<br>
+                • Duration: 2.249182000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: default<br>
+                • Duration: .722172000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: default<br>
+                • Duration: 2.340427000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: default<br>
+                • Duration: 1.607030000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: default<br>
+                • Duration: 2.599481000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_002_10<br>
+                • Model: default<br>
+                • Duration: 2.676888000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_002_14<br>
+                • Model: default<br>
+                • Duration: 3.695040000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_002_15<br>
+                • Model: default<br>
+                • Duration: 2.549259000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_002_16<br>
+                • Model: default<br>
+                • Duration: 3.325848000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_002_17<br>
+                • Model: default<br>
+                • Duration: 3.314023000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_002_18<br>
+                • Model: default<br>
+                • Duration: 3.317975000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_002_19<br>
+                • Model: default<br>
+                • Duration: 3.500156000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: default<br>
+                • Duration: 1.237384000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 30 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: default<br>
+                • Duration: 1.236392000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 31 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: default<br>
+                • Duration: 2.744600000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 32 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_002_5<br>
+                • Model: default<br>
+                • Duration: 2.589018000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 33 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_002_7<br>
+                • Model: default<br>
+                • Duration: 2.747629000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 34 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_002_8<br>
+                • Model: default<br>
+                • Duration: 3.357481000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 35 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_002_9<br>
+                • Model: default<br>
+                • Duration: 2.372691000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 36 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_003_10<br>
+                • Model: default<br>
+                • Duration: 2.376847000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 37 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_003_11<br>
+                • Model: default<br>
+                • Duration: 3.604052000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 38 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_003_12<br>
+                • Model: default<br>
+                • Duration: 2.880752000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 39 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_003_13<br>
+                • Model: default<br>
+                • Duration: 2.462800000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 40 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_003_14<br>
+                • Model: default<br>
+                • Duration: 2.134020000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 41 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_003_15<br>
+                • Model: default<br>
+                • Duration: 3.225135000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 42 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_003_16<br>
+                • Model: default<br>
+                • Duration: 2.194806000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 43 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_003_18<br>
+                • Model: default<br>
+                • Duration: 2.201937000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 44 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_003_19<br>
+                • Model: default<br>
+                • Duration: 1.673203000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 45 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_003_2<br>
+                • Model: default<br>
+                • Duration: 1.713324000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 46 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_003_5<br>
+                • Model: default<br>
+                • Duration: 2.603203000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 47 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_003_6<br>
+                • Model: default<br>
+                • Duration: 3.281352000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 48 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_003_7<br>
+                • Model: default<br>
+                • Duration: 2.904426000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 49 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_003_9<br>
+                • Model: default<br>
+                • Duration: 2.477578000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 50 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_004_1<br>
+                • Model: default<br>
+                • Duration: 1.187100000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 51 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_004_10<br>
+                • Model: default<br>
+                • Duration: 1.787089000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 52 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_004_11<br>
+                • Model: default<br>
+                • Duration: 2.221972000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 53 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_004_12<br>
+                • Model: default<br>
+                • Duration: 2.220396000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 54 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_004_14<br>
+                • Model: default<br>
+                • Duration: 2.395853000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 55 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_004_15<br>
+                • Model: default<br>
+                • Duration: 1.763204000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 56 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_004_16<br>
+                • Model: default<br>
+                • Duration: 1.564510000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 57 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_004_17<br>
+                • Model: default<br>
+                • Duration: 1.701360000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 58 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_004_18<br>
+                • Model: default<br>
+                • Duration: 1.652305000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 59 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_004_19<br>
+                • Model: default<br>
+                • Duration: 1.924422000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 60 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_004_2<br>
+                • Model: default<br>
+                • Duration: 2.641022000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 61 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_004_20<br>
+                • Model: default<br>
+                • Duration: 1.162865000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 62 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_004_3<br>
+                • Model: default<br>
+                • Duration: 1.247654000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 63 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_004_4<br>
+                • Model: default<br>
+                • Duration: 1.120521000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 64 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_004_5<br>
+                • Model: default<br>
+                • Duration: 1.339365000s<br>
+                • Error: 
+            </div>
+            <div class="request-error">
+                <strong>Request 65 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_004_6<br>
+                • Model: default<br>
+                • Duration: 2.344672000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 66 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_005_1<br>
+                • Model: default<br>
+                • Duration: .972981000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 67 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: default<br>
+                • Duration: 1.288351000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 68 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_005_11<br>
+                • Model: default<br>
+                • Duration: 1.265070000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 69 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_005_12<br>
+                • Model: default<br>
+                • Duration: 1.379907000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 70 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_005_13<br>
+                • Model: default<br>
+                • Duration: 1.157386000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 71 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_005_14<br>
+                • Model: default<br>
+                • Duration: 1.252333000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 72 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_005_15<br>
+                • Model: default<br>
+                • Duration: 1.054021000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 73 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_005_16<br>
+                • Model: default<br>
+                • Duration: .884597000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 74 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_005_17<br>
+                • Model: default<br>
+                • Duration: 1.235411000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 75 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_005_18<br>
+                • Model: default<br>
+                • Duration: 1.051896000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 76 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_005_19<br>
+                • Model: default<br>
+                • Duration: .968368000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 77 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: default<br>
+                • Duration: 1.284250000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 78 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_005_20<br>
+                • Model: default<br>
+                • Duration: 1.120957000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 79 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: default<br>
+                • Duration: 1.447508000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 80 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_005_4<br>
+                • Model: default<br>
+                • Duration: 1.415883000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 81 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: default<br>
+                • Duration: 1.641817000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 82 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: default<br>
+                • Duration: 1.200096000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 83 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: default<br>
+                • Duration: 1.016890000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 84 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: default<br>
+                • Duration: 1.140064000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 85 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: default<br>
+                • Duration: 1.133572000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 5a: U5 keys with different models, 10 serial requests per key (50 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+        <p><strong>Results:</strong> 
+            <span class="failure">0 successful</span> / 
+            <span class="failure">50 failed</span> 
+            (0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 50 requests in 1466.507087000s (.03 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (50 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      26 occurrences):</strong><br>
+                Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="error-detail">
+                <strong>Error (      24 occurrences):</strong><br>
+                No choices in response - likely an error
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .417487000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .431289000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .416809000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .414793000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .677495000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .383704000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .410172000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .513989000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .448491000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: .435894000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .437533000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_002_10<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .636798000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .436986000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .458310000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .417347000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_002_5<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .446695000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_002_6<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .448570000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_002_7<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .465874000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_002_8<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .579344000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_002_9<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: .785771000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_003_1<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .579211000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_003_10<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 60.296305000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_003_2<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .417555000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_003_3<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .659655000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_003_4<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .770279000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_003_5<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .951895000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_003_6<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: .453188000s<br>
+                • Error: Error in API gateway: Server disconnected without sending a response.
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_003_7<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 60.267213000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_003_8<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 60.779407000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 30 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_003_9<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 60.346175000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 31 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_004_1<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.283783000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 32 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_004_10<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.340532000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 33 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_004_2<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.357822000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 34 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_004_3<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.299756000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 35 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_004_4<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.483387000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 36 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_004_5<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.293903000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 37 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_004_6<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.268624000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 38 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_004_7<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.275034000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 39 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_004_8<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.275324000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 40 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_004_9<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 60.332618000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 41 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_005_1<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.365591000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 42 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.342699000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 43 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.279374000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 44 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.292117000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 45 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_005_4<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.364630000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 46 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.303580000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 47 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.364606000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 48 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.350981000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 49 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.276339000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 50 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 60.286258000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 5b: U5 keys with different models, 20 serial requests per key (100 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">76 successful</span> / 
+            <span class="failure">24 failed</span> 
+            (76.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 1128.099333000s (.08 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (24 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (       9 occurrences):</strong><br>
+                An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'
+            </div>
+            <div class="error-detail">
+                <strong>Error (      15 occurrences):</strong><br>
+                No choices in response - likely an error
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.386242000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.348262000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_001_11<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.282168000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_001_12<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.371842000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_001_13<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.373783000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_001_14<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.370678000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_001_15<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.351435000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_001_16<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 44.977286000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_001_17<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 3.659329000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_001_18<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 3.545966000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_001_19<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 3.574334000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.277840000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_001_20<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 3.652957000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.381888000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.439238000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.277322000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.270537000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.452375000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.265382000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 60.406401000s<br>
+                • Error: No choices in response - likely an error
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 3.736049000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 3.628558000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 3.537478000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 3.562704000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 6a: U5 keys with different models, 10 concurrent requests per key (50 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+        <p><strong>Results:</strong> 
+            <span class="success">40 successful</span> / 
+            <span class="failure">10 failed</span> 
+            (80.0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 50 requests in 29.978927000s (1.66 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (10 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      10 occurrences):</strong><br>
+                An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_005_1<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 5.033860000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.767358000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 5.008265000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.944926000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_005_4<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.923903000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 6.363439000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 5.003204000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.814260000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.897898000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.594329000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+        </div>
+    </div>
+    <div class="scenario-section">
+        <h3>Scenario 6b: U5 keys with different models, 20 concurrent requests per key (100 total)</h3>
+        <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+        <p><strong>Results:</strong> 
+            <span class="failure">0 successful</span> / 
+            <span class="failure">100 failed</span> 
+            (0% success rate)
+        </p>
+        <p><strong>Performance:</strong> 100 requests in 16.983392000s (5.88 req/s)</p>
+        
+        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (100 errors)</button>
+        <div class="content">
+            <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error (      80 occurrences):</strong><br>
+                An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'
+            </div>
+            <div class="error-detail">
+                <strong>Error (      20 occurrences):</strong><br>
+                An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0xc947658df70f9ceae03e5337fed2783edbf56c715f553de76718b45869d2c740/session'
+            </div>
+            <h4>Individual Request Failures:</h4>
+            <div class="request-error">
+                <strong>Request 1 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_001_1<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.050477000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 2 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_001_10<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.683130000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 3 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_001_11<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.456932000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 4 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_001_12<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.713699000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 5 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_001_13<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 9.555445000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 6 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_001_14<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.144403000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 7 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_001_15<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.686986000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 8 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_001_16<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 7.216609000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 9 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_001_17<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.666193000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 10 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_001_18<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.666003000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 11 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_001_19<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 7.189583000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 12 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_001_2<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.178152000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 13 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_001_20<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 7.195804000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 14 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_001_3<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 8.534546000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 15 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_001_4<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 12.217161000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 16 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_001_5<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 5.688165000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 17 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_001_6<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 8.486539000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 18 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_001_7<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.816264000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 19 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_001_8<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 7.365511000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 20 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_001_9<br>
+                • Model: llama-3.1-8b<br>
+                • Duration: 6.406283000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 21 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_002_1<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.184594000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 22 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_002_10<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 8.394563000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 23 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_002_11<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 6.121819000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 24 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_002_12<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 6.698922000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 25 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_002_13<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.057261000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 26 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_002_14<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.043853000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 27 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_002_15<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.295023000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 28 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_002_16<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.291828000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 29 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_002_17<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.024690000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 30 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_002_18<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 8.356618000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 31 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_002_19<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.030108000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 32 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_002_2<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.134084000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 33 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_002_20<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 8.398873000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 34 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_002_3<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.151197000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 35 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_002_4<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 5.570884000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 36 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_002_5<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 5.689503000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 37 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_002_6<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.138002000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 38 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_002_7<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 5.688436000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 39 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_002_8<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 7.072878000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 40 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_002_9<br>
+                • Model: llama-3.1-70b<br>
+                • Duration: 6.867968000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 41 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_003_1<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 11.956472000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 42 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_003_10<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 12.174447000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 43 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_003_11<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 12.360392000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 44 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_003_12<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 7.009239000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 45 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_003_13<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 6.611794000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 46 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_003_14<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 11.912306000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 47 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_003_15<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 10.318556000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 48 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_003_16<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 11.625444000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 49 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_003_17<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.029057000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 50 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_003_18<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.341415000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 51 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_003_19<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.014070000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 52 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_003_2<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.385207000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 53 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_003_20<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 11.605131000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 54 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_003_3<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 12.198371000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 55 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_003_4<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 9.185069000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 56 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_003_5<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 12.418816000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 57 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_003_6<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.372871000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 58 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_003_7<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 9.684094000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 59 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_003_8<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 12.179451000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 60 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_003_9<br>
+                • Model: qwen-2.5-coder-32b<br>
+                • Duration: 8.047015000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 61 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_004_1<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 3.901334000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 62 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_004_10<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.056721000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 63 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_004_11<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 7.411408000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 64 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_004_12<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 10.095283000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 65 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_004_13<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.122273000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 66 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_004_14<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.024330000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 67 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_004_15<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.335280000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 68 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_004_16<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.251921000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 69 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_004_17<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 9.711098000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 70 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_004_18<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.238136000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 71 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_004_19<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.013030000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 72 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_004_2<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.341076000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 73 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_004_20<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.540502000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 74 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_004_3<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 6.904759000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 75 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_004_4<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.255342000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 76 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_004_5<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.624386000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 77 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_004_6<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 4.736388000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 78 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_004_7<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 3.969928000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 79 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_004_8<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 6.990002000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 80 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_004_9<br>
+                • Model: llama-3.1-405b<br>
+                • Duration: 6.909179000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 81 (request_1.json):</strong><br>
+                • Conversation ID: conv_key_005_1<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.542762000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 82 (request_10.json):</strong><br>
+                • Conversation ID: conv_key_005_10<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.844866000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 83 (request_11.json):</strong><br>
+                • Conversation ID: conv_key_005_11<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 9.232481000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 84 (request_12.json):</strong><br>
+                • Conversation ID: conv_key_005_12<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.825889000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 85 (request_13.json):</strong><br>
+                • Conversation ID: conv_key_005_13<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.431340000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 86 (request_14.json):</strong><br>
+                • Conversation ID: conv_key_005_14<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.387465000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 87 (request_15.json):</strong><br>
+                • Conversation ID: conv_key_005_15<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.702875000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 88 (request_16.json):</strong><br>
+                • Conversation ID: conv_key_005_16<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 8.033954000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 89 (request_17.json):</strong><br>
+                • Conversation ID: conv_key_005_17<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 5.723179000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 90 (request_18.json):</strong><br>
+                • Conversation ID: conv_key_005_18<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 8.275601000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 91 (request_19.json):</strong><br>
+                • Conversation ID: conv_key_005_19<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 8.021165000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 92 (request_2.json):</strong><br>
+                • Conversation ID: conv_key_005_2<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.295041000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 93 (request_20.json):</strong><br>
+                • Conversation ID: conv_key_005_20<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 7.775995000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 94 (request_3.json):</strong><br>
+                • Conversation ID: conv_key_005_3<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.540092000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 95 (request_4.json):</strong><br>
+                • Conversation ID: conv_key_005_4<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.535227000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 96 (request_5.json):</strong><br>
+                • Conversation ID: conv_key_005_5<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.895260000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 97 (request_6.json):</strong><br>
+                • Conversation ID: conv_key_005_6<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 9.040822000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 98 (request_7.json):</strong><br>
+                • Conversation ID: conv_key_005_7<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.378318000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 99 (request_8.json):</strong><br>
+                • Conversation ID: conv_key_005_8<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.833292000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+            <div class="request-error">
+                <strong>Request 100 (request_9.json):</strong><br>
+                • Conversation ID: conv_key_005_9<br>
+                • Model: gpt-4o-mini<br>
+                • Duration: 4.843928000s<br>
+                • Error: An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500...
+            </div>
+        </div>
+    </div>
+    
+    <h2>📋 Summary & Recommendations</h2>
+    
+    <div class="scenario-section">
+        <h3>Test Results Summary</h3>
+        <p>This test analyzed <strong>820</strong> total API requests across multiple scenarios.</p>
+        <p class="warning"><strong>Issues Detected:</strong> 402 requests failed (418 successful). This indicates potential API reliability issues.</p>
+        
+        <h4>Key Findings:</h4>
+        <ul>
+            <li>API reliability issues detected - 402 out of 820 requests failed</li>
+            <li>Success rate of 50.97% is below recommended 90% threshold</li>
+        </ul>
+    </div>
+    
+    <div class="summary">
+        <h3>Test Metadata</h3>
+        <p><strong>Test Directory:</strong> ./results/scenario_test_20250624_131029</p>
+        <p><strong>Report Generated:</strong> Tue Jun 24 14:01:12 PDT 2025</p>
+        <p><strong>Total Test Duration:</strong> 2995.17 seconds</p>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_1",
+  "status": "0",
+  "duration": "3.033806000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-83f82d4b4b0c44ab88629511ec310450",
+    "object": "chat.completion",
+    "created": 1750795993,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I can't generate an answer for this question right now as I don't have access to the tools that allow me to do so. I'm sorry for the inconvenience."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

@@ -1,7 +1,0 @@
-{
-  "conversation_id": "conv_key_003_20",
-  "status": "0",
-  "duration": "32.167562000",
-  "model": "default",
-  "error": "Unexpected error validating API key: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00 (Background on this error at: https://sqlalche.me/e/20/3o7r)"
-}

@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_003_9",
+  "status": "0",
+  "duration": "60.346175000",
+  "model": "qwen-2.5-coder-32b",
+  "error": "No choices in response - likely an error"
+}

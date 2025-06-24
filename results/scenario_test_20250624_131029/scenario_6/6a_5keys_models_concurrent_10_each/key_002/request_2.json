@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_2",
+  "status": "0",
+  "duration": "1.713489000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-087fe109d78448048e37474a3df151be",
+    "object": "chat.completion",
+    "created": 1750798780,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence involves creating systems that can perform tasks typically requiring human intelligence, such as learning, reasoning, problem-solving, and language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 29,
+      "total_tokens": 531
+    },
+    "system_fingerprint": ""
+  }
+}

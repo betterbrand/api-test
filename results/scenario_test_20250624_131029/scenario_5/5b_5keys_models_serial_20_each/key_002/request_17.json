@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_17",
+  "status": "0",
+  "duration": "1.321826000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-752cf2d05a5b4880ba6e23b6952ad5c7",
+    "object": "chat.completion",
+    "created": 1750798662,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence has revolutionized numerous sectors by enabling machines to learn, adapt, and perform tasks that typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 41,
+      "total_tokens": 543
+    },
+    "system_fingerprint": ""
+  }
+}

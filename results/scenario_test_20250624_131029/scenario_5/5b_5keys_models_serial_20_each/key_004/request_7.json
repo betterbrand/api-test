@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_004_7",
+  "status": "0",
+  "duration": "1.913591000",
+  "model": "llama-3.1-405b",
+  "response": {
+    "id": "20d7194ffe2c4d46ad907e38b76c7457",
+    "object": "chat.completion",
+    "created": 1750798713,
+    "model": "llama-3.1-405b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence (AI) is a rapidly evolving field of computer science that enables machines to perform tasks that typically require human intelligence, such as learning, problem-solving, decision-making, and perception."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 155,
+      "completion_tokens": 40,
+      "total_tokens": 195
+    },
+    "system_fingerprint": ""
+  }
+}

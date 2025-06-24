@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_20",
+  "status": "0",
+  "duration": "6.587657000",
+  "model": "default",
+  "response": {
+    "id": "chatcmpl-76f57d137c8c4e489cc26df7a019958d",
+    "object": "chat.completion",
+    "created": 1750796181,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence refers to the simulation of human intelligence in machines that are programmed to think, learn, and problem-solve. I can also clarify the different types of AI, such as Narrow AI, General AI, and Super AI. For example, Narrow AI is designed to perform a narrow task, such as facial recognition or internet searches; General AI has the ability to perform any intellectual task that a human can do; and Super AI refers to AI that possesses intelligence surpassing that of the brightest and most gifted human minds in practically every economically valuable work"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 114,
+      "total_tokens": 616
+    },
+    "system_fingerprint": ""
+  }
+}
