@@ -879,14 +879,17 @@ EOF
                     local model=$(jq -r '.model // "default"' "$request_file" 2>/dev/null)
                     local error_msg=$(jq -r '.error // "Unknown error"' "$request_file" 2>/dev/null)
                     local filename=$(basename "$request_file")
+                    local error_line=$(grep -n '"error":' "$request_file" | head -n1 | cut -d: -f1)
                     
                     cat >> "$test_dir/scenario_report.html" << EOF
             <div class="request-error">
                 <strong>Request $request_count ($filename):</strong><br>
+                • File: $request_file<br>
+                • Error line: $error_line<br>
                 • Conversation ID: $conv_id<br>
                 • Model: $model<br>
                 • Duration: ${request_duration}s<br>
-                • Error: $(echo "$error_msg" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' | cut -c1-200)$([ ${#error_msg} -gt 200 ] && echo "...")
+                • Error: $(echo "$error_msg" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
             </div>
 EOF
                 fi
