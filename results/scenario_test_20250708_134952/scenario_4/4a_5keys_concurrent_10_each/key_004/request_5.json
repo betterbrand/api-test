@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_004_5",
+  "status": "0",
+  "duration": ".418482000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-4d2569c2c67a49fbb06eb1071d894af5",
+    "object": "chat.completion",
+    "created": 1752008201,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence is the simulation of human intelligence in machines that are programmed to think, learn, and problem-solve like humans."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 27,
+      "total_tokens": 529
+    },
+    "system_fingerprint": ""
+  }
+}

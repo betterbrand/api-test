@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_13",
+  "status": "0",
+  "duration": "1.734617000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-5fb21ec06d1244aca9871009d3c688f8",
+    "object": "chat.completion",
+    "created": 1752007828,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence is a branch of computer science that aims to create machines capable of performing tasks that typically require human intelligence, such as learning, problem-solving, perception, language understanding, and decision-making."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 41,
+      "total_tokens": 543
+    },
+    "system_fingerprint": ""
+  }
+}

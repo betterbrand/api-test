@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_3",
+  "status": "0",
+  "duration": "1.294862000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-b3ea7fec016a4c0cafe327f759cbe878",
+    "object": "chat.completion",
+    "created": 1752008014,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence (AI) doesn't refer to a specific device, but to a program or system's ability to interpret and analyze data in order to learn and make decisions."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_7",
+  "status": "0",
+  "duration": "1.198282000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-5dfa888e4b9f418b89e50548c9effe04",
+    "object": "chat.completion",
+    "created": 1752008100,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence is a technology that allows machines to perceive, reason, learn, and act like human beings."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 23,
+      "total_tokens": 525
+    },
+    "system_fingerprint": ""
+  }
+}

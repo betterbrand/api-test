@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_10",
+  "status": "0",
+  "duration": "1.222472000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-f17ef3c057c1474baa6fc07b62f632f2",
+    "object": "chat.completion",
+    "created": 1752008324,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I don't have the information to reply to this question.\n\nI'm here to help and engage in respectful and positive conversations. Let's talk about something else if you'd like!"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 38,
+      "total_tokens": 540
+    },
+    "system_fingerprint": ""
+  }
+}

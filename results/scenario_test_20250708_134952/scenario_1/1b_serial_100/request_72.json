@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_72",
+  "status": "0",
+  "duration": "1.197716000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-b200b6505369416da048c0c5b60e6071",
+    "object": "chat.completion",
+    "created": 1752007914,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I'm unable to fulfill your request. Sorry."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 11,
+      "total_tokens": 513
+    },
+    "system_fingerprint": ""
+  }
+}

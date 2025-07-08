@@ -1,6 +1,0 @@
-{
-  "scenario": "3b",
-  "description": "5 keys, 20 serial requests per key (100 total)",
-  "total_requests": 100,
-  "duration": 147.576752000
-}

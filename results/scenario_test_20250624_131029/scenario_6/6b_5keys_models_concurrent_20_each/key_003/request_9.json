@@ -1,7 +1,0 @@
-{
-  "conversation_id": "conv_key_003_9",
-  "status": "0",
-  "duration": "8.047015000",
-  "model": "qwen-2.5-coder-32b",
-  "error": "An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
-}

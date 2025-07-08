@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_25",
+  "status": "0",
+  "duration": "1.610788000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-6179d31bbde74fa19818cff4082dd57f",
+    "object": "chat.completion",
+    "created": 1752007846,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence in 2025 refers to the simulation of human intelligence in machines that are programmed to think and learn, encompassing a range of capabilities from speech recognition and problem-solving to autonomous decision-making, significantly impacting various industries and daily life."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 51,
+      "total_tokens": 553
+    },
+    "system_fingerprint": ""
+  }
+}

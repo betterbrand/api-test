@@ -1,7 +1,0 @@
-{
-  "conversation_id": "conv_key_005_6",
-  "status": "0",
-  "duration": "2.621664000",
-  "model": "default",
-  "error": "Error in API gateway: Expecting value: line 1 column 1 (char 0)"
-}

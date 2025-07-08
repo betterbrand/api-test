@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_005_19",
+  "status": "0",
+  "duration": ".901498000",
+  "model": "gpt-4o-mini",
+  "error": "Error in API gateway: Extra data: line 1 column 368 (char 367)"
+}

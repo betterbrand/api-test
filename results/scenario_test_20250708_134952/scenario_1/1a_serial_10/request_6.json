@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_6",
+  "status": "0",
+  "duration": "1.303480000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-ad20d0d55921409d99dec66c7771c2c7",
+    "object": "chat.completion",
+    "created": 1752007801,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence (AI) refers to the development of computer systems that can perform tasks typically requiring human intelligence, such as learning, problem-solving, perception, and language understanding."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 36,
+      "total_tokens": 538
+    },
+    "system_fingerprint": ""
+  }
+}

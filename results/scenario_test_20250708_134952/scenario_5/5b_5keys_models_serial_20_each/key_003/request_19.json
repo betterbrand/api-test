@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_003_19",
+  "status": "0",
+  "duration": "1.430872000",
+  "model": "qwen-2.5-coder-32b",
+  "error": "Error in API gateway: Extra data: line 1 column 371 (char 370)"
+}

@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_002_10",
+  "status": "0",
+  "duration": "2.784809000",
+  "model": "llama-3.1-8b",
+  "error": "Error in API gateway: Expecting value: line 1 column 1 (char 0)"
+}

@@ -1,0 +1,6 @@
+{
+  "scenario": "2b",
+  "description": "Single key, 100 concurrent requests",
+  "total_requests": 100,
+  "duration": 26.725435000
+}

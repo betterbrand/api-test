@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_004_13",
+  "status": "0",
+  "duration": "1.235770000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-1b5dff0c58184e8686b99c4a24b8e8fb",
+    "object": "chat.completion",
+    "created": 1752008164,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence involves the development of digital technologies and systems capable of performing tasks that typically require human intelligence, such as problem-solving, learning, and adapting based on data."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 35,
+      "total_tokens": 537
+    },
+    "system_fingerprint": ""
+  }
+}

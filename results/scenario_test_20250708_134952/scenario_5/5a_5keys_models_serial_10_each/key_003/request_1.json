@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_003_1",
+  "status": "0",
+  "duration": ".365441000",
+  "model": "qwen-2.5-coder-32b",
+  "error": "Error in API gateway: peer closed connection without sending complete message body (incomplete chunked read)"
+}

@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_002_16",
+  "status": "0",
+  "duration": "2.113179000",
+  "model": "llama-3.1-8b",
+  "error": "Error in API gateway: Server disconnected without sending a response."
+}

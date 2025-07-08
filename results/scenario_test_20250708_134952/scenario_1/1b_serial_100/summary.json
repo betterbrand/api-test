@@ -1,0 +1,6 @@
+{
+  "scenario": "1b",
+  "description": "Single key, 100 serial requests",
+  "total_requests": 100,
+  "duration": 145.027137000
+}

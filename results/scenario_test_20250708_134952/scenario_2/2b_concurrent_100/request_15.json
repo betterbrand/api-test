@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_15",
+  "status": "0",
+  "duration": "1.986613000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-5651d3bc6f6743c095fc700dfd7e9b78",
+    "object": "chat.completion",
+    "created": 1752007957,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial intelligence refers to advanced technology that enables machines to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 31,
+      "total_tokens": 533
+    },
+    "system_fingerprint": ""
+  }
+}

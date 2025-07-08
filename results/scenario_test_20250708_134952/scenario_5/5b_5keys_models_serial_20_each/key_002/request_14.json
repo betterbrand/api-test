@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_002_14",
+  "status": "0",
+  "duration": "1.273997000",
+  "model": "llama-3.1-70b",
+  "response": {
+    "id": "chatcmpl-e8b418279f7e4feeb4227891a5630c7c",
+    "object": "chat.completion",
+    "created": 1752008329,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "The term artificial intelligence refers to the development of computer systems able to perform tasks that typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 37,
+      "total_tokens": 539
+    },
+    "system_fingerprint": ""
+  }
+}

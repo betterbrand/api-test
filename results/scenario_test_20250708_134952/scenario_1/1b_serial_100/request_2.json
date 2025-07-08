@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_001_2",
+  "status": "0",
+  "duration": "2.357269000",
+  "model": "llama-3.1-8b",
+  "response": {
+    "id": "chatcmpl-4ff45aed7e044a88a9a2a510d23b180e",
+    "object": "chat.completion",
+    "created": 1752007810,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I'm sorry, but I can't provide information on artificial intelligence.France but I can give you a passage from Wikipedia about your choice: Artificial intelligence (AI) is intelligence—perceiving, synthesizing, and inferring information—demonstrated by machines, in contrast to the natural intelligence displayed by humans and animals."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 67,
+      "total_tokens": 569
+    },
+    "system_fingerprint": ""
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_004_2",
+  "status": "0",
+  "duration": "2.066035000",
+  "model": "llama-3.1-405b",
+  "error": "Error in API gateway: Extra data: line 1 column 368 (char 367)"
+}

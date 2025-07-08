@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Morpheus API Scenario Test Report - Dynamic Error Analysis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
+        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .critical-error { background: #ffebee; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #f44336; }
+        .scenario-section { background: #f9f9f9; padding: 15px; margin: 15px 0; border-left: 4px solid #007cba; border-radius: 5px; }
+        .error-detail { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; font-size: 0.9em; border-left: 3px solid #ffc107; }
+        .request-error { background: #ffebee; padding: 8px; margin: 5px 0; border-radius: 3px; font-size: 0.85em; }
+        .success { color: green; font-weight: bold; }
+        .failure { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .error-count { background: #ffcdd2; padding: 5px; border-radius: 3px; }
+        .collapsible { background-color: #e3f2fd; color: #000; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; border-radius: 5px; margin: 5px 0; }
+        .collapsible:hover { background-color: #bbdefb; }
+        .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f1f8ff; }
+        .scenario-list { list-style: none; padding: 0; margin: 0; }
+        .scenario-item { margin-bottom: 20px; }
+    </style>
+    <script>
+        function toggleContent(element) {
+            var content = element.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                element.innerHTML = element.innerHTML.replace("▼", "▶");
+            } else {
+                content.style.display = "block";
+                element.innerHTML = element.innerHTML.replace("▶", "▼");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>🚨 Morpheus API Scenario Test Report - Dynamic Error Analysis</h1>
+    
+    <div class="summary">
+        <h2>Overall Test Summary</h2>
+        <p><strong>Test Date:</strong> 2025-07-08 14:01:46</p>
+        <p><strong>Total Scenarios:</strong> 12</p>
+        <p><strong>Total Requests:</strong> 820</p>
+        <p><strong>Successful Requests:</strong> <span class="success">355</span></p>
+        <p><strong>Failed Requests:</strong> <span class="failure">465</span></p>
+        <p><strong>Success Rate:</strong> <span class="failure">43.29%</span></p>
+    </div>
+    <div class="critical-error">
+        <h2>🔥 Critical System Alert</h2>
+        <p><strong>WARNING:</strong> Success rate below 50% indicates significant system issues</p>
+        <p><strong>Impact:</strong> Partial system failure - reliability compromised</p>
+    </div>
+    <h2>📊 Scenario Performance Overview</h2>
+    
+    <table>
+        <tr>
+            <th>Scenario</th>
+            <th>Description</th>
+            <th>Requests</th>
+            <th>Duration (s)</th>
+            <th>Rate (req/s)</th>
+            <th>Success Rate</th>
+        </tr>
+        <tr>
+            <td>1a</td>
+            <td>Single key, 10 serial requests</td>
+            <td>10</td>
+            <td>15.967640000</td>
+            <td>.62</td>
+            <td class="success">100.0%</td>
+        </tr>
+        <tr>
+            <td>1b</td>
+            <td>Single key, 100 serial requests</td>
+            <td>100</td>
+            <td>145.027137000</td>
+            <td>.68</td>
+            <td class="success">99.0%</td>
+        </tr>
+        <tr>
+            <td>2a</td>
+            <td>Single key, 10 concurrent requests</td>
+            <td>10</td>
+            <td>2.184770000</td>
+            <td>4.57</td>
+            <td class="failure">10.0%</td>
+        </tr>
+        <tr>
+            <td>2b</td>
+            <td>Single key, 100 concurrent requests</td>
+            <td>100</td>
+            <td>26.725435000</td>
+            <td>3.74</td>
+            <td class="failure">5.0%</td>
+        </tr>
+        <tr>
+            <td>3a</td>
+            <td>5 keys, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>82.756776000</td>
+            <td>.60</td>
+            <td class="success">94.0%</td>
+        </tr>
+        <tr>
+            <td>3b</td>
+            <td>5 keys, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>133.677416000</td>
+            <td>.74</td>
+            <td class="failure">79.0%</td>
+        </tr>
+        <tr>
+            <td>4a</td>
+            <td>5 keys, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>3.920885000</td>
+            <td>12.75</td>
+            <td class="failure">20.0%</td>
+        </tr>
+        <tr>
+            <td>4b</td>
+            <td>5 keys, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>5.250166000</td>
+            <td>19.04</td>
+            <td class="failure">0%</td>
+        </tr>
+        <tr>
+            <td>5a</td>
+            <td>5 keys with different models, 10 serial requests per key (50 total)</td>
+            <td>50</td>
+            <td>69.928665000</td>
+            <td>.71</td>
+            <td class="failure">40.0%</td>
+        </tr>
+        <tr>
+            <td>5b</td>
+            <td>5 keys with different models, 20 serial requests per key (100 total)</td>
+            <td>100</td>
+            <td>178.702313000</td>
+            <td>.55</td>
+            <td class="success">81.0%</td>
+        </tr>
+        <tr>
+            <td>6a</td>
+            <td>5 keys with different models, 10 concurrent requests per key (50 total)</td>
+            <td>50</td>
+            <td>31.476100000</td>
+            <td>1.58</td>
+            <td class="failure">6.0%</td>
+        </tr>
+        <tr>
+            <td>6b</td>
+            <td>5 keys with different models, 20 concurrent requests per key (100 total)</td>
+            <td>100</td>
+            <td>16.173641000</td>
+            <td>6.18</td>
+            <td class="failure">0%</td>
+        </tr>
+    </table>
+    
+    <h2>🔍 Detailed Scenario Analysis with Error Breakdown</h2>
+    <ol class="scenario-list">
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 1a: USingle key, 10 serial requests</h3>
+            <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">10 successful</span> / 
+                <span class="success">0 failed</span> 
+                (100.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 10 requests in 15.967640000s (.62 req/s)</p>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 1b: USingle key, 100 serial requests</h3>
+            <p><strong>Purpose:</strong> Test API performance with a single key under serial load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">99 successful</span> / 
+                <span class="failure">1 failed</span> 
+                (99.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 145.027137000s (.68 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (1 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 2a: USingle key, 10 concurrent requests</h3>
+            <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">1 successful</span> / 
+                <span class="failure">9 failed</span> 
+                (10.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 10 requests in 2.184770000s (4.57 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (9 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (9 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 2b: USingle key, 100 concurrent requests</h3>
+            <p><strong>Purpose:</strong> Test API performance with a single key under concurrent load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">5 successful</span> / 
+                <span class="failure">95 failed</span> 
+                (5.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 26.725435000s (3.74 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (95 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (17 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (77 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 368 (char 367)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 3a: U5 keys, 10 serial requests per key (50 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+            <p><strong>Results:</strong> 
+                <span class="success">47 successful</span> / 
+                <span class="failure">3 failed</span> 
+                (94.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 50 requests in 82.756776000s (.60 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (3 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (2 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 3b: U5 keys, 20 serial requests per key (100 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys under serial load per key</p>
+            <p><strong>Results:</strong> 
+                <span class="success">79 successful</span> / 
+                <span class="failure">21 failed</span> 
+                (79.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 133.677416000s (.74 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (21 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> No choices in response - likely an error<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (12 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (6 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #4 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 373 (char 372)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #5 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 368 (char 367)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 4a: U5 keys, 10 concurrent requests per key (50 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+            <p><strong>Results:</strong> 
+                <span class="success">10 successful</span> / 
+                <span class="failure">40 failed</span> 
+                (20.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 50 requests in 3.920885000s (12.75 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (40 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (37 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (3 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Server disconnected without sending a response.<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 4b: U5 keys, 20 concurrent requests per key (100 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys under concurrent load per key</p>
+            <p><strong>Results:</strong> 
+                <span class="failure">0 successful</span> / 
+                <span class="failure">100 failed</span> 
+                (0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 5.250166000s (19.04 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (100 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: peer closed connection without sending complete message body (incomplete chunked read)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (46 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (53 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Server disconnected without sending a response.<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 5a: U5 keys with different models, 10 serial requests per key (50 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">20 successful</span> / 
+                <span class="failure">30 failed</span> 
+                (40.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 50 requests in 69.928665000s (.71 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (30 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (9 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Server disconnected without sending a response.<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: peer closed connection without sending complete message body (incomplete chunked read)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (10 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-70b<br>
+                <strong>Error:</strong> Error in API gateway: Server disconnected without sending a response.<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-70b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #4 (1 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: peer closed connection without sending complete message body (incomplete chunked read)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #5 (2 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Server disconnected without sending a response.<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #6 (1 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #7 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #8 (3 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #9 (1 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #10 (1 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 5b: U5 keys with different models, 20 serial requests per key (100 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under serial load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">81 successful</span> / 
+                <span class="failure">19 failed</span> 
+                (81.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 178.702313000s (.55 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (19 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (3 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (3 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-70b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-70b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #4 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-70b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-70b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #5 (1 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 371 (char 370)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #6 (2 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #7 (1 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #8 (3 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #9 (1 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 368 (char 367)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #10 (2 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #11 (1 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 368 (char 367)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 6a: U5 keys with different models, 10 concurrent requests per key (50 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+            <p><strong>Results:</strong> 
+                <span class="success">3 successful</span> / 
+                <span class="failure">47 failed</span> 
+                (6.0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 50 requests in 31.476100000s (1.58 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (47 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (10 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (8 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-70b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-70b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (10 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #4 (2 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> <br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #5 (5 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0xc947658df70f9ceae03e5337fed2783edbf56c715f553de76718b45869d2c740/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #6 (2 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> Error in API gateway: Expecting value: line 1 column 1 (char 0)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #7 (9 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #8 (1 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> Error in API gateway: Extra data: line 1 column 369 (char 368)<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario 6b: U5 keys with different models, 20 concurrent requests per key (100 total)</h3>
+            <p><strong>Purpose:</strong> Test API performance with multiple keys using different models under concurrent load</p>
+            <p><strong>Results:</strong> 
+                <span class="failure">0 successful</span> / 
+                <span class="failure">100 failed</span> 
+                (0% success rate)
+            </p>
+            <p><strong>Performance:</strong> 100 requests in 16.173641000s (6.18 req/s)</p>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details (100 errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
+            <div class="error-detail">
+                <strong>Error Pattern #1 (20 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-8b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-8b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #2 (20 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-70b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-70b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #3 (20 occurrences):</strong><br>
+                <strong>Model:</strong> qwen-2.5-coder-32b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "qwen-2.5-coder-32b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #4 (20 occurrences):</strong><br>
+                <strong>Model:</strong> llama-3.1-405b<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0xc947658df70f9ceae03e5337fed2783edbf56c715f553de76718b45869d2c740/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "llama-3.1-405b",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            <div class="error-detail">
+                <strong>Error Pattern #5 (20 occurrences):</strong><br>
+                <strong>Model:</strong> gpt-4o-mini<br>
+                <strong>Error:</strong> An unexpected error occurred during session creation: Error from proxy router after 3 attempts: Server error '500 Internal Server Error' for url 'http://morpheus-router.mor.org:8082/blockchain/models/0x8e5c0229ab1dac1753b24e6614ae7c4a4896463ca4929d7601b2b241384d3bbd/session'<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Tell me about artificial intelligence in one sentence."
+    }
+  ],
+  "stream": false
+}</pre>
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+                </div>
+            </div>
+            </div>
+        </div>
+    </li>
+    </ol>
+    
+    <h2>📋 Summary & Recommendations</h2>
+    
+    <div class="scenario-section">
+        <h3>Test Results Summary</h3>
+        <p>This test analyzed <strong>820</strong> total API requests across multiple scenarios.</p>
+        <p class="warning"><strong>Issues Detected:</strong> 465 requests failed (355 successful). This indicates potential API reliability issues.</p>
+        
+        <h4>Key Findings:</h4>
+        <ul>
+            <li>API reliability issues detected - 465 out of 820 requests failed</li>
+            <li>Success rate of 43.29% is below recommended 90% threshold</li>
+        </ul>
+    </div>
+    
+    <div class="summary">
+        <h3>Test Metadata</h3>
+        <p><strong>Test Directory:</strong> ./results/scenario_test_20250708_134952</p>
+        <p><strong>Report Generated:</strong> Tue Jul  8 14:02:46 PDT 2025</p>
+        <p><strong>Total Test Duration:</strong> 711.79 seconds</p>
+    </div>
+    
+</body>
+</html>

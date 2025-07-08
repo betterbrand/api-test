@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_005_18",
+  "status": "0",
+  "duration": "1.277314000",
+  "model": "gpt-4o-mini",
+  "error": "Error in API gateway: Expecting value: line 1 column 1 (char 0)"
+}

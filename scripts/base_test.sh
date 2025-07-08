@@ -22,6 +22,9 @@ LOAD_TEST_SCRIPT="$SCRIPT_DIR/load_test.sh"
 
 # Test configuration
 MODELS=("llama-3.1-8b" "llama-3.1-70b" "qwen-2.5-coder-32b" "llama-3.1-405b" "gpt-4o-mini")
+# Default model for requests without explicit model parameter
+DEFAULT_MODEL="${MODELS[0]}"
+export DEFAULT_MODEL
 
 # Logging functions
 log_info() {
@@ -94,7 +97,7 @@ send_single_request() {
     local api_key="$1"
     local conversation_id="$2"
     local result_file="$3"
-    local model="${4:-default}"
+    local model="${4:-$DEFAULT_MODEL}"
     
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [REQUEST] Starting request for $conversation_id with key $api_key, model $model"
     
@@ -695,7 +698,8 @@ generate_report() {
         .collapsible { background-color: #e3f2fd; color: #000; cursor: pointer; padding: 10px; width: 100%; border: none; text-align: left; outline: none; font-size: 14px; border-radius: 5px; margin: 5px 0; }
         .collapsible:hover { background-color: #bbdefb; }
         .content { padding: 0 18px; display: none; overflow: hidden; background-color: #f1f8ff; }
-        .expanded { display: block; }
+        .scenario-list { list-style: none; padding: 0; margin: 0; }
+        .scenario-item { margin-bottom: 20px; }
     </style>
     <script>
         function toggleContent(element) {
@@ -789,6 +793,7 @@ EOF
     </table>
     
     <h2>🔍 Detailed Scenario Analysis with Error Breakdown</h2>
+    <ol class="scenario-list">
 EOF
 
     # Generate detailed scenario analysis with dynamic error reporting
@@ -823,87 +828,136 @@ EOF
         fi
         
         cat >> "$test_dir/scenario_report.html" << EOF
-    <div class="scenario-section">
-        <h3>Scenario $scenario_id: $(echo "$description" | sed 's/^./\U&/')</h3>
-        <p><strong>Purpose:</strong> $(get_scenario_purpose "$scenario_id")</p>
-        <p><strong>Results:</strong> 
-            <span class="$([ $scenario_successful -gt 0 ] && echo "success" || echo "failure")">$scenario_successful successful</span> / 
-            <span class="$([ $scenario_failed -eq 0 ] && echo "success" || echo "failure")">$scenario_failed failed</span> 
-            ($scenario_success_rate% success rate)
-        </p>
-        <p><strong>Performance:</strong> $total_req requests in ${duration}s ($(echo "scale=2; $total_req / $duration" | bc -l 2>/dev/null || echo 0) req/s)</p>
+    <li class="scenario-item">
+        <div class="scenario-section">
+            <h3>Scenario $scenario_id: $(echo "$description" | sed 's/^./\U&/')</h3>
+            <p><strong>Purpose:</strong> $(get_scenario_purpose "$scenario_id")</p>
+            <p><strong>Results:</strong> 
+                <span class="$([ $scenario_successful -gt 0 ] && echo "success" || echo "failure")">$scenario_successful successful</span> / 
+                <span class="$([ $scenario_failed -eq 0 ] && echo "success" || echo "failure")">$scenario_failed failed</span> 
+                ($scenario_success_rate% success rate)
+            </p>
+            <p><strong>Performance:</strong> $total_req requests in ${duration}s ($(echo "scale=2; $total_req / $duration" | bc -l 2>/dev/null || echo 0) req/s)</p>
 EOF
 
         # Add error details if there are failures
         if [ $scenario_failed -gt 0 ]; then
             cat >> "$test_dir/scenario_report.html" << EOF
-        
-        <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details ($scenario_failed errors)</button>
-        <div class="content">
-            <h4>Error Analysis:</h4>
+            
+            <button type="button" class="collapsible" onclick="toggleContent(this)">▶ Show Error Details ($scenario_failed errors)</button>
+            <div class="content">
+                <h4>Error Analysis:</h4>
 EOF
 
-            # Group and display errors
-            if [ ${#error_samples[@]} -gt 0 ]; then
-                # Create a temporary file to properly handle multi-line errors
-                local temp_errors=$(mktemp)
-                printf '%s\n' "${error_samples[@]}" | sort > "$temp_errors"
-                
-                # Get unique errors with counts
-                while IFS= read -r unique_error; do
-                    if [ -n "$unique_error" ] && [ "$unique_error" != "null" ]; then
-                        local error_count=$(grep -Fx "$unique_error" "$temp_errors" | wc -l)
-                        cat >> "$test_dir/scenario_report.html" << EOF
-            <div class="error-detail">
-                <strong>Error ($error_count occurrences):</strong><br>
-                $(echo "$unique_error" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-            </div>
-EOF
-                    fi
-                done < <(sort "$temp_errors" | uniq)
-                
-                rm -f "$temp_errors"
-            fi
+            # Collect unique request/response/error combinations
+            local temp_combinations=$(mktemp)
+            local temp_details=$(mktemp)
             
-            # Show individual request failures
-            cat >> "$test_dir/scenario_report.html" << EOF
-            <h4>Individual Request Failures:</h4>
-EOF
-            
-            local request_count=0
+            # Process all failed requests to extract unique patterns
             for request_file in "${scenario_requests[@]}"; do
                 if grep -q '"error":' "$request_file"; then
-                    request_count=$((request_count + 1))
-                    local conv_id=$(jq -r '.conversation_id // "unknown"' "$request_file" 2>/dev/null)
-                    local request_duration=$(jq -r '.duration // "unknown"' "$request_file" 2>/dev/null)
-                    local model=$(jq -r '.model // "default"' "$request_file" 2>/dev/null)
-                    local error_msg=$(jq -r '.error // "Unknown error"' "$request_file" 2>/dev/null)
-                    local filename=$(basename "$request_file")
-                    local error_line=$(grep -n '"error":' "$request_file" | head -n1 | cut -d: -f1)
+                    local model=$(jq -r ".model // \"$DEFAULT_MODEL\"" "$request_file" 2>/dev/null)
+                    local error_msg=$(jq -r '.error // "Unknown error"' "$request_file" 2>/dev/null | head -1)
                     
-                    cat >> "$test_dir/scenario_report.html" << EOF
-            <div class="request-error">
-                <strong>Request $request_count ($filename):</strong><br>
-                • File: $request_file<br>
-                • Error line: $error_line<br>
-                • Conversation ID: $conv_id<br>
-                • Model: $model<br>
-                • Duration: ${request_duration}s<br>
-                • Error: $(echo "$error_msg" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-            </div>
-EOF
+                    # Create standardized request body (what was sent to API)
+                    local request_body=$(jq -n \
+                        --arg model "$model" \
+                        '{
+                             model: $model,
+                             messages: [
+                                 {role: "system", content: "You are a helpful assistant."},
+                                 {role: "user", content: "Tell me about artificial intelligence in one sentence."}
+                             ],
+                             stream: false
+                         }')
+                    
+                    # Try to extract response if available (for non-HTTP errors)
+                    local response_content=""
+                    if jq -e '.response' "$request_file" > /dev/null 2>&1; then
+                        response_content=$(jq -c '.response' "$request_file" 2>/dev/null)
+                    else
+                        response_content="null"
+                    fi
+                    
+                    # Create a unique combination key
+                    local combo_key=$(echo "${model}||${error_msg}" | md5sum | cut -d' ' -f1)
+                    
+                    # Store combination details
+                    echo "$combo_key" >> "$temp_combinations"
+                    if ! grep -q "^$combo_key:" "$temp_details" 2>/dev/null; then
+                        # Base64 encode the components to handle special characters safely
+                        local encoded_error=$(echo "$error_msg" | base64)
+                        local encoded_request=$(echo "$request_body" | base64)
+                        local encoded_response=$(echo "$response_content" | base64)
+                        echo "$combo_key:$model:$encoded_error:$encoded_request:$encoded_response" >> "$temp_details"
+                    fi
                 fi
             done
             
+            # Generate unique error pattern reports
+            local pattern_count=0
+            while read -r line; do
+                if [ -z "$line" ]; then continue; fi
+                
+                # Split the line using : as delimiter
+                IFS=':' read -r combo_key model encoded_error encoded_request encoded_response <<< "$line"
+                
+                if [ -z "$combo_key" ]; then continue; fi
+                pattern_count=$((pattern_count + 1))
+                local occurrence_count=$(grep -c "^$combo_key$" "$temp_combinations")
+                
+                # Base64 decode the components
+                local error_msg=$(echo "$encoded_error" | base64 -d 2>/dev/null || echo "$encoded_error")
+                local request_body=$(echo "$encoded_request" | base64 -d 2>/dev/null || echo "$encoded_request")
+                local response_content=$(echo "$encoded_response" | base64 -d 2>/dev/null || echo "$encoded_response")
+                
+                cat >> "$test_dir/scenario_report.html" << EOF
+            <div class="error-detail">
+                <strong>Error Pattern #$pattern_count ($occurrence_count occurrences):</strong><br>
+                <strong>Model:</strong> $model<br>
+                <strong>Error:</strong> $(echo "$error_msg" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')<br>
+                
+                <button type="button" class="collapsible" onclick="toggleContent(this)" style="margin-top: 10px; background-color: #fff3cd;">▶ Show Request/Response Details</button>
+                <div class="content" style="background-color: #fffbf0; margin-top: 5px;">
+                    <h5>Request Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">$(echo "$request_body" | jq '.' 2>/dev/null | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' || echo "$request_body" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')</pre>
+EOF
+                
+                if [ -n "$response_content" ] && [ "$response_content" != "null" ] && [ "$response_content" != "" ]; then
+                    cat >> "$test_dir/scenario_report.html" << EOF
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em;">$(echo "$response_content" | jq '.' 2>/dev/null | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' || echo "$response_content" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')</pre>
+EOF
+                else
+                    cat >> "$test_dir/scenario_report.html" << EOF
+                    <h5>Response Body:</h5>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 0.8em; color: #666;">No response received (likely connection/HTTP error)</pre>
+EOF
+                fi
+                
+                cat >> "$test_dir/scenario_report.html" << EOF
+                </div>
+            </div>
+EOF
+            done < "$temp_details"
+            
+            # Clean up temp files
+            rm -f "$temp_combinations" "$temp_details"
+            
             cat >> "$test_dir/scenario_report.html" << EOF
-        </div>
+            </div>
 EOF
         fi
         
         cat >> "$test_dir/scenario_report.html" << EOF
-    </div>
+        </div>
+    </li>
 EOF
     done
+    
+    cat >> "$test_dir/scenario_report.html" << EOF
+    </ol>
+EOF
     
     # Add summary recommendations
     cat >> "$test_dir/scenario_report.html" << EOF

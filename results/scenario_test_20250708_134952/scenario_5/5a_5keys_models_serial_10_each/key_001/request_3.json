@@ -1,0 +1,7 @@
+{
+  "conversation_id": "conv_key_001_3",
+  "status": "0",
+  "duration": ".546689000",
+  "model": "llama-3.1-8b",
+  "error": "Error in API gateway: peer closed connection without sending complete message body (incomplete chunked read)"
+}

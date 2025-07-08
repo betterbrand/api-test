@@ -1,0 +1,28 @@
+{
+  "conversation_id": "conv_key_003_20",
+  "status": "0",
+  "duration": "1.432420000",
+  "model": "qwen-2.5-coder-32b",
+  "response": {
+    "id": "chatcmpl-5ddac09778b948399c44b67c7e2b8a4e",
+    "object": "chat.completion",
+    "created": 1752008364,
+    "model": "mistral-31-24b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Artificial Intelligence refers to the simulation of human intelligence in machines that are programmed to think and learn like humans, enabling them to perform tasks that typically require human cognition, such as visual perception, speech recognition, decision-making, and language translation, to provide a single example."
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 502,
+      "completion_tokens": 55,
+      "total_tokens": 557
+    },
+    "system_fingerprint": ""
+  }
+}
